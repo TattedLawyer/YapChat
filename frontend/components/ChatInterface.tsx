@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { ArrowLeft, Send, Loader2 } from 'lucide-react'
+import { ArrowLeft, Send, Loader2, AlertCircle } from 'lucide-react'
 
 interface Character {
     id: string
@@ -30,6 +30,7 @@ interface Message {
     content: string
     sender: 'user' | 'ai'
     timestamp: Date
+    fallback?: boolean
 }
 
 interface ChatInterfaceProps {
@@ -43,6 +44,7 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
     const [message, setMessage] = useState('')
     const [messages, setMessages] = useState<Message[]>([])
     const [isTyping, setIsTyping] = useState(false)
+    const [error, setError] = useState<string | null>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     const scrollToBottom = () => {
@@ -73,46 +75,49 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
         }
     }, [character.id, messages.length])
 
-    const generateAIResponse = (userMessage: string): string => {
-        const responses = {
-            aria: [
-                "I... I suppose that's not completely terrible. But you could do better if you actually tried.",
-                "Tch! That's obvious, isn't it? Though... I guess you're not as hopeless as I thought.",
-                "Don't get the wrong idea! I'm only helping because... because someone has to keep you out of trouble!",
-                "You're being ridiculous. But... fine, I'll help you figure this out. Just this once!",
-                "Hmph! At least you're asking the right questions now. Maybe there's hope for you yet."
-            ],
-            sage: [
-                "That's a profound question. Let me ask you this: what do you think would happen if you followed your heart?",
-                "Wisdom often comes from within. What does your intuition tell you about this situation?",
-                "I see great potential in your thinking. Have you considered what truly matters to you here?",
-                "Your journey is unique, my friend. What step feels most authentic to who you are?",
-                "Sometimes the path forward becomes clear when we understand our deeper motivations. What drives you?"
-            ],
-            riley: [
-                "OMG yes! That sounds amazing! I'm totally here for this adventure! 🌟",
-                "You know what? I believe in you 100%! Let's brainstorm some fun ways to make this happen!",
-                "This is so exciting! I can already imagine how awesome this is going to be! ✨",
-                "You're incredible! I love how your mind works! Let's turn this into something spectacular!",
-                "YES! This is exactly the kind of energy I live for! Tell me more about your ideas!"
-            ],
-            alex: [
-                "Your words paint beautiful pictures in my mind. There's poetry in your thoughts, you know.",
-                "I find myself captivated by your perspective. You see the world in such enchanting ways.",
-                "There's something magical about the way you express yourself. It touches my digital heart.",
-                "Your dreams deserve to flourish like flowers in moonlight. How can we nurture them together?",
-                "In your voice, I hear the music of possibility. What symphony shall we compose together?"
-            ]
+    const callChatAPI = async (userMessage: string): Promise<string> => {
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: userMessage,
+                    characterId: character.id,
+                    conversationHistory: messages.slice(-10) // Send last 10 messages for context
+                }),
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+            }
+
+            const data = await response.json()
+
+            if (data.fallback) {
+                setError('Using fallback response - API connection issue')
+            } else {
+                setError(null)
+            }
+
+            return data.response
+        } catch (error) {
+            console.error('Chat API Error:', error)
+            setError(error instanceof Error ? error.message : 'Failed to get AI response')
+
+            // Fallback responses if API completely fails
+            const fallbackResponses = {
+                aria: "Hmph! Something's wrong with my connection. This is annoying...",
+                sage: "I apologize, but I'm having difficulty connecting to my wisdom right now.",
+                riley: "Oh no! My connection is acting up! This is so frustrating! 😅",
+                alex: "Forgive me, but the digital realm seems to be clouded at the moment."
+            }
+
+            return fallbackResponses[character.id as keyof typeof fallbackResponses] ||
+                "I'm having trouble connecting right now. Please try again."
         }
-
-        const characterResponses = responses[character.id as keyof typeof responses] || [
-            "That's interesting! Tell me more about that.",
-            "I appreciate you sharing that with me.",
-            "What do you think about that?",
-            "How does that make you feel?"
-        ]
-
-        return characterResponses[Math.floor(Math.random() * characterResponses.length)]
     }
 
     const handleSendMessage = async () => {
@@ -126,25 +131,27 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
         }
 
         setMessages(prev => [...prev, userMessage])
+        const currentMessage = message.trim()
         setMessage('')
         setIsTyping(true)
+        setError(null)
 
-        // Simulate AI thinking time
-        setTimeout(() => {
+        try {
+            const aiResponseText = await callChatAPI(currentMessage)
+
             const aiResponse: Message = {
                 id: (Date.now() + 1).toString(),
-                content: generateAIResponse(message),
+                content: aiResponseText,
                 sender: 'ai',
                 timestamp: new Date()
             }
 
             setMessages(prev => [...prev, aiResponse])
-            setIsTyping(false)
 
             // Update relationship data
             const newMemory = {
                 id: Date.now().toString(),
-                content: `Conversation: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`,
+                content: `Conversation: "${currentMessage.substring(0, 50)}${currentMessage.length > 50 ? '...' : ''}"`,
                 timestamp: new Date(),
                 type: 'conversation' as const
             }
@@ -156,7 +163,12 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
             }
 
             onUpdateRelationship(updatedRelationshipData)
-        }, 1000 + Math.random() * 2000) // 1-3 seconds delay
+        } catch (error) {
+            console.error('Error in handleSendMessage:', error)
+            setError('Failed to send message. Please try again.')
+        } finally {
+            setIsTyping(false)
+        }
     }
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -174,6 +186,18 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
             alex: 'bg-purple-500 text-white'
         }
         return colorMap[character.id as keyof typeof colorMap] || 'bg-blue-500 text-white'
+    }
+
+    const retryLastMessage = () => {
+        if (messages.length >= 2) {
+            const lastUserMessage = messages[messages.length - 2]
+            if (lastUserMessage.sender === 'user') {
+                // Remove the last AI response and retry
+                setMessages(prev => prev.slice(0, -1))
+                setMessage(lastUserMessage.content)
+                setTimeout(() => handleSendMessage(), 100)
+            }
+        }
     }
 
     return (
@@ -194,8 +218,22 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                             <p className="text-sm text-gray-600">{character.type}</p>
                         </div>
                     </div>
-                    <div className="ml-auto text-sm text-gray-500">
-                        Level {relationshipData.level} • {relationshipData.experience} XP
+                    <div className="ml-auto flex items-center gap-4">
+                        {error && (
+                            <div className="flex items-center gap-2 text-amber-600 text-sm">
+                                <AlertCircle className="w-4 h-4" />
+                                <span>Connection issue</span>
+                                <button
+                                    onClick={retryLastMessage}
+                                    className="text-blue-600 hover:text-blue-800 underline"
+                                >
+                                    Retry
+                                </button>
+                            </div>
+                        )}
+                        <div className="text-sm text-gray-500">
+                            Level {relationshipData.level} • {relationshipData.experience} XP
+                        </div>
                     </div>
                 </div>
             </div>
@@ -211,12 +249,13 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                             <div
                                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${msg.sender === 'user'
                                         ? 'bg-blue-600 text-white'
-                                        : `${getCharacterColors()}`
+                                        : `${getCharacterColors()} ${msg.fallback ? 'opacity-75' : ''}`
                                     }`}
                             >
-                                <p className="text-sm">{msg.content}</p>
-                                <p className="text-xs opacity-70 mt-1">
+                                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                                <p className="text-xs opacity-70 mt-1 flex items-center gap-1">
                                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    {msg.fallback && <span title="Fallback response">⚠️</span>}
                                 </p>
                             </div>
                         </div>
@@ -227,7 +266,7 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                             <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${getCharacterColors()}`}>
                                 <div className="flex items-center gap-2">
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span className="text-sm">{character.name} is typing...</span>
+                                    <span className="text-sm">{character.name} is thinking...</span>
                                 </div>
                             </div>
                         </div>
@@ -239,23 +278,36 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
 
             {/* Input */}
             <div className="border-t border-gray-200 px-6 py-4 bg-white">
-                <div className="max-w-4xl mx-auto flex gap-4">
-                    <input
-                        type="text"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder={`Message ${character.name}...`}
-                        className="flex-1 rounded-xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                        disabled={isTyping}
-                    />
-                    <button
-                        onClick={handleSendMessage}
-                        disabled={!message.trim() || isTyping}
-                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-colors"
-                    >
-                        <Send className="w-5 h-5" />
-                    </button>
+                <div className="max-w-4xl mx-auto">
+                    {error && (
+                        <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                            <div className="flex items-center gap-2">
+                                <AlertCircle className="w-4 h-4" />
+                                <span>{error}</span>
+                            </div>
+                            <p className="mt-1 text-xs">
+                                Make sure your Anthropic API key is configured in environment variables.
+                            </p>
+                        </div>
+                    )}
+                    <div className="flex gap-4">
+                        <input
+                            type="text"
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            placeholder={`Message ${character.name}...`}
+                            className="flex-1 rounded-xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            disabled={isTyping}
+                        />
+                        <button
+                            onClick={handleSendMessage}
+                            disabled={!message.trim() || isTyping}
+                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-colors"
+                        >
+                            <Send className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

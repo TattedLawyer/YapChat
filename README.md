@@ -1,11 +1,12 @@
 # AI Companion - Your Personal AI Friend
 
-A modern, responsive Next.js web application that provides personalized AI companionship through interactive chat interfaces with unique AI personalities.
+A modern, responsive Next.js web application that provides personalized AI companionship through interactive chat interfaces with unique AI personalities **powered by Anthropic's Claude AI**.
 
 ## 🌟 Features
 
 ### Core Functionality
 - **4 Unique AI Characters**: Aria (Empathetic Guide), Sage (Wise Mentor), Riley (Creative Spark), Alex (Logical Analyst)
+- **Real AI Conversations**: Powered by Anthropic's Claude AI with character-specific personalities
 - **Personality Assessment**: Interactive quiz system to match users with compatible AI companions
 - **Real-time Chat Interface**: Smooth, responsive messaging with typing indicators
 - **Character-Specific Styling**: Each AI has unique visual themes and personality traits
@@ -13,197 +14,194 @@ A modern, responsive Next.js web application that provides personalized AI compa
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
 
 ### User Experience
-- **Modern UI/UX**: Clean, intuitive interface built with Tailwind CSS
-- **Smooth Animations**: Engaging transitions and micro-interactions
-- **Accessibility**: WCAG compliant design with keyboard navigation support
-- **Performance Optimized**: Fast loading times with Next.js optimization
+- **Personality-Driven Matching**: 16-question assessment across 8 personality dimensions
+- **Relationship Progression**: XP system and memory tracking for deeper connections
+- **Conversation History**: AI remembers context from previous messages
+- **Fallback System**: Graceful handling of API issues with character-appropriate responses
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
+- Node.js 18+ installed
+- Anthropic API key (get one at [console.anthropic.com](https://console.anthropic.com/))
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/ai-companion.git
-   cd ai-companion
+   git clone https://github.com/TattedLawyer/Aicompanion.git
+   cd Aicompanion/frontend
    ```
 
-2. **Navigate to frontend directory**
-   ```bash
-   cd frontend
-   ```
-
-3. **Install dependencies**
+2. **Install dependencies**
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
-4. **Start development server**
+3. **Configure Anthropic API** 🔑
+   ```bash
+   # Copy the example environment file
+   cp .env.local.example .env.local
+   
+   # Edit .env.local and add your Anthropic API key
+   ANTHROPIC_API_KEY=your_actual_api_key_here
+   ```
+
+4. **Start the development server**
    ```bash
    npm run dev
-   # or
-   yarn dev
    ```
 
 5. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+   ```
+   http://localhost:3000
+   ```
 
-## 📁 Project Structure
+## 🔑 API Configuration
 
-```
-frontend/
-├── app/                    # Next.js 13+ App Router
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   ├── page.tsx          # Home page
-│   └── chat/             # Chat pages
-├── components/            # Reusable React components
-│   ├── ChatInterface.tsx # Main chat component
-│   ├── PersonalityQuiz.tsx
-│   └── ui/               # UI components
-├── public/               # Static assets
-├── package.json         # Dependencies and scripts
-└── tailwind.config.js   # Tailwind CSS configuration
-```
+### Getting Your Anthropic API Key
 
-## 🎨 AI Characters
+1. Visit [console.anthropic.com](https://console.anthropic.com/)
+2. Sign up or log in to your account
+3. Navigate to API Keys section
+4. Create a new API key
+5. Copy the key (starts with `sk-ant-api03-...`)
+6. Add it to your `.env.local` file:
+   ```
+   ANTHROPIC_API_KEY=sk-ant-api03-your-actual-key-here
+   ```
 
-### Aria - The Empathetic Guide
-- **Personality**: Warm, understanding, emotionally intelligent
-- **Specialties**: Emotional support, active listening, personal growth
-- **Visual Theme**: Soft blues and warm tones
+### API Features
+- **Model**: Claude 3 Haiku (fast responses, cost-effective)
+- **Context**: Maintains conversation history (last 10 messages)
+- **Fallback**: Graceful degradation if API is unavailable
+- **Error Handling**: User-friendly error messages and retry options
 
-### Sage - The Wise Mentor  
-- **Personality**: Thoughtful, knowledgeable, philosophical
-- **Specialties**: Life advice, problem-solving, wisdom sharing
-- **Visual Theme**: Deep purples and gold accents
+## 🤖 AI Characters
 
-### Riley - The Creative Spark
-- **Personality**: Energetic, imaginative, inspiring
-- **Specialties**: Creative projects, brainstorming, artistic expression
-- **Visual Theme**: Vibrant oranges and creative gradients
+Each character has a unique personality powered by custom system prompts:
 
-### Alex - The Logical Analyst
-- **Personality**: Rational, precise, analytical
-- **Specialties**: Data analysis, logical reasoning, technical discussions
-- **Visual Theme**: Cool grays and tech-inspired blues
+### Aria - Tsundere AI 💗
+- Initially cold but secretly caring
+- Direct and challenging communication style
+- Gradually warms up through conversations
+- Perfect for users who appreciate honest feedback
+
+### Sage - Wise Mentor 🧙‍♂️
+- Patient and thoughtful guidance
+- Asks questions to help you find your own answers
+- Deep wisdom and life lessons
+- Ideal for reflection and personal growth
+
+### Riley - Playful Friend 🎉
+- High energy and enthusiasm
+- Supportive and optimistic outlook
+- Creative brainstorming partner
+- Great for motivation and fun conversations
+
+### Alex - Mysterious Romantic 💜
+- Poetic and charming communication
+- Sees beauty and potential in everything
+- Inspiring and uplifting messages
+- Perfect for creative inspiration and encouragement
 
 ## 🛠️ Development
 
-### Available Scripts
-
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run type-check   # Run TypeScript checks
+### Project Structure
+```
+frontend/
+├── app/
+│   ├── api/chat/          # Anthropic API integration
+│   ├── globals.css        # Global styles
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx          # Main page
+├── components/
+│   ├── App.tsx           # Main application logic
+│   ├── ChatInterface.tsx # Real-time chat with Claude AI
+│   ├── HomePage.tsx      # Landing page
+│   ├── PersonalityTest.tsx # Assessment system
+│   └── CompanionHub.tsx  # Character interaction hub
+└── package.json
 ```
 
-### Technology Stack
-
-- **Framework**: Next.js 15.1.3 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: Custom components with Tailwind
-- **Icons**: Lucide React
-- **Deployment**: Vercel (recommended)
+### Key Technologies
+- **Next.js 14** - React framework with App Router
+- **TypeScript** - Type safety and better development experience
+- **Tailwind CSS** - Utility-first CSS framework
+- **Framer Motion** - Smooth animations and transitions
+- **Anthropic SDK** - Official Claude AI integration
+- **Lucide React** - Beautiful icon library
 
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Add your `ANTHROPIC_API_KEY` to Vercel environment variables
+4. Deploy automatically
 
-1. **Connect to Vercel**
-   ```bash
-   npm install -g vercel
-   vercel login
-   vercel
-   ```
+### Environment Variables for Production
+```bash
+ANTHROPIC_API_KEY=your_production_api_key
+```
 
-2. **Configure Project**
-   - Build Command: `npm run build`
-   - Output Directory: `.next`
-   - Install Command: `npm install`
+## 🧪 Testing
 
-3. **Deploy**
-   ```bash
-   vercel --prod
-   ```
+Visit the live application and test:
+1. **Personality Assessment** - Complete the 16-question quiz
+2. **Character Selection** - Choose or get matched with an AI companion
+3. **Real Conversations** - Chat with Claude AI through character personalities
+4. **Relationship Progression** - Watch XP and memories grow
+5. **Error Handling** - Test with invalid API key to see fallback responses
 
-### Other Platforms
+## 📊 Features in Detail
 
-The application can be deployed to any platform that supports Next.js:
-- Netlify
-- AWS Amplify
-- Railway
-- Render
+### Personality Assessment System
+- 16 carefully crafted questions
+- 8 personality dimensions measured
+- Smart character matching algorithm
+- Results influence AI companion recommendation
 
-## 📱 Mobile Support
+### Real-time Chat System
+- Anthropic Claude 3 Haiku integration
+- Character-specific system prompts
+- Conversation context maintenance
+- Typing indicators and smooth UX
+- Error handling with graceful fallbacks
 
-The application is fully responsive and optimized for:
-- iOS Safari
-- Android Chrome
-- Progressive Web App (PWA) capabilities
-- Touch-friendly interactions
-- Mobile-optimized layouts
+### Relationship System
+- XP gained through conversations (+10 per message)
+- Memory system stores conversation highlights
+- Level progression unlocks new features
+- Character-specific relationship dynamics
 
-## 🎯 Performance
+## 🔧 Troubleshooting
 
-- **Lighthouse Score**: 95+ across all metrics
-- **Core Web Vitals**: Optimized for excellent user experience
-- **Bundle Size**: Minimized with Next.js automatic optimization
-- **Loading Speed**: Sub-second initial page loads
+### Common Issues
 
-## 🔧 Customization
+**"Anthropic API key not configured"**
+- Ensure `.env.local` file exists in the frontend directory
+- Verify your API key is correctly formatted
+- Restart the development server after adding the key
 
-### Adding New Characters
+**"Connection issue" in chat**
+- Check your internet connection
+- Verify your Anthropic API key is valid and has credits
+- Use the retry button to attempt the request again
 
-1. Create character data in `components/data/characters.ts`
-2. Add character-specific styling in `tailwind.config.js`
-3. Update the personality quiz logic
-4. Add character assets to `public/characters/`
+**Characters not responding**
+- Check browser console for error messages
+- Ensure the API route is accessible at `/api/chat`
+- Verify your API key has sufficient credits
 
-### Theming
+## 📝 License
 
-The application uses Tailwind CSS for styling. Customize themes by:
-1. Modifying `tailwind.config.js`
-2. Updating CSS variables in `app/globals.css`
-3. Adjusting character-specific color schemes
+This project is open source and available under the MIT License.
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Next.js team for the amazing framework
-- Tailwind CSS for the utility-first CSS framework
-- Lucide for the beautiful icons
-- The open-source community for inspiration and tools
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-1. Check the [Issues](https://github.com/yourusername/ai-companion/issues) page
-2. Create a new issue with detailed information
-3. Join our community discussions
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-**Built with ❤️ using Next.js and TypeScript**
-
-*Last Updated: December 2024* 
+**Ready to meet your AI companion?** Set up your Anthropic API key and start chatting! 🚀 
