@@ -166,15 +166,27 @@ export default function App() {
             enhancedPrompt += `- Life approach: ${preferences.life_approach}\n`
         }
         if (preferences.curiosity_style) {
-            enhancedPrompt += `- Intellectual interests: ${preferences.curiosity_style}\n`
+            if (Array.isArray(preferences.curiosity_style)) {
+                enhancedPrompt += `- Intellectual interests: ${preferences.curiosity_style.join(', ')}\n`
+            } else {
+                enhancedPrompt += `- Intellectual interests: ${preferences.curiosity_style}\n`
+            }
         }
 
         // Add companion role preferences
         if (preferences.ideal_companion_role) {
-            enhancedPrompt += `- Desired companion role: ${preferences.ideal_companion_role}\n`
+            if (Array.isArray(preferences.ideal_companion_role)) {
+                enhancedPrompt += `- Desired companion roles: ${preferences.ideal_companion_role.join(', ')}\n`
+            } else {
+                enhancedPrompt += `- Desired companion role: ${preferences.ideal_companion_role}\n`
+            }
         }
         if (preferences.connection_pace) {
-            enhancedPrompt += `- Connection style: ${preferences.connection_pace}\n`
+            if (Array.isArray(preferences.connection_pace)) {
+                enhancedPrompt += `- Connection styles: ${preferences.connection_pace.join(', ')}\n`
+            } else {
+                enhancedPrompt += `- Connection style: ${preferences.connection_pace}\n`
+            }
         }
 
         // Add personality insights

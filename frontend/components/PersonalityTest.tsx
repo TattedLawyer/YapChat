@@ -113,9 +113,9 @@ const conversationalQuestions: ConversationalQuestion[] = [
     },
     {
         id: 'curiosity_style',
-        type: 'select',
+        type: 'multiselect',
         question: "What kind of topics genuinely fascinate you?",
-        subtitle: "What makes you light up when discussing it?",
+        subtitle: "Select all that make you light up when discussing them",
         category: "Intellectual Interests",
         options: [
             { value: 'people_psychology', label: 'People, psychology, and human nature', emoji: '🧭' },
@@ -136,9 +136,9 @@ const conversationalQuestions: ConversationalQuestion[] = [
     // Companion Relationship Dynamics (Questions 11-12)
     {
         id: 'ideal_companion_role',
-        type: 'select',
-        question: "What role would you want your ideal companion to play in your life?",
-        subtitle: "Think about what would be most meaningful to you",
+        type: 'multiselect',
+        question: "What roles would you want your ideal companion to play in your life?",
+        subtitle: "Select all that would be meaningful to you",
         category: "Companion Role",
         options: [
             { value: 'trusted_confidant', label: 'A trusted confidant who truly knows me', emoji: '🤝' },
@@ -149,9 +149,9 @@ const conversationalQuestions: ConversationalQuestion[] = [
     },
     {
         id: 'connection_pace',
-        type: 'select',
+        type: 'multiselect',
         question: "How do you naturally form deep connections?",
-        subtitle: "Your authentic way of building meaningful relationships",
+        subtitle: "Select all the ways you build meaningful relationships",
         category: "Connection Style",
         options: [
             { value: 'gradual_trust', label: 'Gradually, as trust builds over time', emoji: '🌱' },
@@ -269,6 +269,23 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
             insights.push(`Your admiration for ${answers.favorite_character} reveals you value ${answers.what_attracts_character.toLowerCase()}`)
         }
 
+        // Intellectual interests insights (can be multiple)
+        if (answers.curiosity_style && Array.isArray(answers.curiosity_style)) {
+            const interests = answers.curiosity_style
+            if (interests.includes('people_psychology')) {
+                insights.push("You're fascinated by human nature and what makes people tick")
+            }
+            if (interests.includes('ideas_philosophy')) {
+                insights.push("You love exploring big ideas and the deeper meaning of things")
+            }
+            if (interests.includes('creative_arts')) {
+                insights.push("You're drawn to creativity, stories, and imaginative expression")
+            }
+            if (interests.includes('practical_world')) {
+                insights.push("You enjoy understanding how things work and practical knowledge")
+            }
+        }
+
         // Relationship values insights (can be multiple)
         if (answers.relationship_values && Array.isArray(answers.relationship_values)) {
             const values = answers.relationship_values
@@ -286,12 +303,54 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
             }
         }
 
+        // Companion role insights (can be multiple)
+        if (answers.ideal_companion_role && Array.isArray(answers.ideal_companion_role)) {
+            const roles = answers.ideal_companion_role
+            if (roles.includes('trusted_confidant')) {
+                insights.push("You want a companion who truly knows and understands you")
+            }
+            if (roles.includes('intellectual_partner')) {
+                insights.push("You value intellectual stimulation and growth in relationships")
+            }
+            if (roles.includes('emotional_support')) {
+                insights.push("You appreciate having a reliable source of emotional comfort")
+            }
+            if (roles.includes('adventure_companion')) {
+                insights.push("You want to share life's experiences and adventures with your companion")
+            }
+        }
+
+        // Connection style insights (can be multiple)
+        if (answers.connection_pace && Array.isArray(answers.connection_pace)) {
+            const styles = answers.connection_pace
+            if (styles.includes('gradual_trust')) {
+                insights.push("You prefer building connections slowly as trust develops over time")
+            }
+            if (styles.includes('instant_chemistry')) {
+                insights.push("You can form quick connections when there's natural chemistry")
+            }
+            if (styles.includes('shared_experiences')) {
+                insights.push("You bond through shared activities and creating memories together")
+            }
+            if (styles.includes('deep_conversations')) {
+                insights.push("You connect through meaningful dialogue and emotional vulnerability")
+            }
+        }
+
         return insights
     }
 
     const extractConversationalStyle = (answers: Record<string, any>) => {
+        // Handle multiple curiosity styles
+        let communicationPreference = 'balanced'
+        if (answers.curiosity_style && Array.isArray(answers.curiosity_style)) {
+            communicationPreference = answers.curiosity_style.join(', ')
+        } else if (answers.curiosity_style) {
+            communicationPreference = answers.curiosity_style
+        }
+
         return {
-            communicationPreference: answers.curiosity_style || 'balanced',
+            communicationPreference,
             energyLevel: answers.social_energy || 'moderate',
             humorStyle: 'character_determined', // Let character personality determine this
             supportStyle: answers.emotional_support_need || 'empathetic',
@@ -305,8 +364,21 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
         // Map answers to Big Five personality dimensions
 
         // Openness to Experience
-        if (answers.curiosity_style === 'ideas_philosophy') scores.openness = 0.9
-        if (answers.curiosity_style === 'creative_arts') scores.openness = 0.8
+        if (answers.curiosity_style && Array.isArray(answers.curiosity_style)) {
+            if (answers.curiosity_style.includes('ideas_philosophy')) {
+                scores.openness = (scores.openness || 0) + 0.9
+            }
+            if (answers.curiosity_style.includes('creative_arts')) {
+                scores.openness = (scores.openness || 0) + 0.8
+            }
+            if (answers.curiosity_style.includes('people_psychology')) {
+                scores.openness = (scores.openness || 0) + 0.6
+            }
+        } else if (answers.curiosity_style === 'ideas_philosophy') {
+            scores.openness = 0.9
+        } else if (answers.curiosity_style === 'creative_arts') {
+            scores.openness = 0.8
+        }
         if (answers.life_approach === 'spontaneous_adaptable') scores.openness = (scores.openness || 0) + 0.3
 
         // Extraversion
@@ -317,7 +389,13 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
         // Conscientiousness
         if (answers.life_approach === 'careful_thoughtful') scores.conscientiousness = 0.8
         if (answers.life_approach === 'ambitious_driven') scores.conscientiousness = 0.7
-        if (answers.connection_pace === 'gradual_trust') scores.conscientiousness = (scores.conscientiousness || 0) + 0.2
+        if (answers.connection_pace && Array.isArray(answers.connection_pace)) {
+            if (answers.connection_pace.includes('gradual_trust')) {
+                scores.conscientiousness = (scores.conscientiousness || 0) + 0.2
+            }
+        } else if (answers.connection_pace === 'gradual_trust') {
+            scores.conscientiousness = (scores.conscientiousness || 0) + 0.2
+        }
 
         // Agreeableness
         if (answers.emotional_support_need === 'someone_listen') scores.agreeableness = 0.8
