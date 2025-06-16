@@ -33,14 +33,21 @@ interface Message {
     fallback?: boolean
 }
 
+interface PersonalityResults {
+    preferences: Record<string, any>
+    personality: Record<string, number>
+    insights: string[]
+}
+
 interface ChatInterfaceProps {
     character: Character
     onBack: () => void
     relationshipData: RelationshipData
     onUpdateRelationship: (data: RelationshipData) => void
+    personalityResults?: PersonalityResults | null
 }
 
-export default function ChatInterface({ character, onBack, relationshipData, onUpdateRelationship }: ChatInterfaceProps) {
+export default function ChatInterface({ character, onBack, relationshipData, onUpdateRelationship, personalityResults }: ChatInterfaceProps) {
     const [message, setMessage] = useState('')
     const [messages, setMessages] = useState<Message[]>([])
     const [isTyping, setIsTyping] = useState(false)
@@ -55,23 +62,51 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
         scrollToBottom()
     }, [messages])
 
-    // Initialize with a greeting message
+    // Initialize with a natural first message from the character
     useEffect(() => {
-        const greetings = {
-            aria: "Hmph... So you decided to talk to me? Fine, I suppose I have some time. What's on your mind?",
-            sage: "Welcome, my friend. I sense you have something you'd like to discuss. Please, share what's in your heart.",
-            riley: "Hey there! 🎉 I'm so excited to chat with you! What's going on? Tell me everything!",
-            alex: "Hello, beautiful soul. Your presence here feels like destiny. What thoughts dance in your mind today?"
-        }
-
         if (messages.length === 0) {
-            const greeting: Message = {
-                id: '1',
-                content: greetings[character.id as keyof typeof greetings] || `Hello! I'm ${character.name}. How can I help you today?`,
-                sender: 'ai',
-                timestamp: new Date()
+            // Send an empty first message to get the character's natural greeting
+            const initializeChat = async () => {
+                setIsTyping(true)
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: "Hi",
+                            characterProfile: (character as any).profile,
+                            isFirstMessage: true
+                        }),
+                    })
+
+                    if (response.ok) {
+                        const data = await response.json()
+                        const greeting: Message = {
+                            id: '1',
+                            content: data.response,
+                            sender: 'ai',
+                            timestamp: new Date()
+                        }
+                        setMessages([greeting])
+                    }
+                } catch (error) {
+                    console.error('Error getting initial greeting:', error)
+                    // Fallback to simple greeting
+                    const greeting: Message = {
+                        id: '1',
+                        content: `Hey! What's up?`,
+                        sender: 'ai',
+                        timestamp: new Date()
+                    }
+                    setMessages([greeting])
+                } finally {
+                    setIsTyping(false)
+                }
             }
-            setMessages([greeting])
+
+            initializeChat()
         }
     }, [character.id, messages.length])
 
@@ -84,8 +119,9 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                 },
                 body: JSON.stringify({
                     message: userMessage,
-                    characterId: character.id,
-                    conversationHistory: messages.slice(-10) // Send last 10 messages for context
+                    characterProfile: (character as any).profile,
+                    conversationHistory: messages.slice(-10), // Send last 10 messages for context
+                    isFirstMessage: false
                 }),
             })
 
@@ -107,16 +143,13 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
             console.error('Chat API Error:', error)
             setError(error instanceof Error ? error.message : 'Failed to get AI response')
 
-            // Fallback responses if API completely fails
-            const fallbackResponses = {
-                aria: "Hmph! Something's wrong with my connection. This is annoying...",
-                sage: "I apologize, but I'm having difficulty connecting to my wisdom right now.",
-                riley: "Oh no! My connection is acting up! This is so frustrating! 😅",
-                alex: "Forgive me, but the digital realm seems to be clouded at the moment."
+            // Fallback response based on character personality
+            const characterProfile = (character as any).profile
+            if (characterProfile?.personality_traits?.communication_style) {
+                return `I'm having some trouble connecting right now. Please try again.`
             }
 
-            return fallbackResponses[character.id as keyof typeof fallbackResponses] ||
-                "I'm having trouble connecting right now. Please try again."
+            return "I'm having trouble connecting right now. Please try again."
         }
     }
 
@@ -179,13 +212,8 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
     }
 
     const getCharacterColors = () => {
-        const colorMap = {
-            aria: 'bg-pink-500 text-white',
-            sage: 'bg-green-500 text-white',
-            riley: 'bg-orange-500 text-white',
-            alex: 'bg-purple-500 text-white'
-        }
-        return colorMap[character.id as keyof typeof colorMap] || 'bg-blue-500 text-white'
+        // Use primary color for all custom characters
+        return 'bg-primary-500 text-white'
     }
 
     const retryLastMessage = () => {
@@ -248,8 +276,8 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                         >
                             <div
                                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${msg.sender === 'user'
-                                        ? 'bg-blue-600 text-white'
-                                        : `${getCharacterColors()} ${msg.fallback ? 'opacity-75' : ''}`
+                                    ? 'bg-blue-600 text-white'
+                                    : `${getCharacterColors()} ${msg.fallback ? 'opacity-75' : ''}`
                                     }`}
                             >
                                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>

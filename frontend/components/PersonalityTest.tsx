@@ -2,181 +2,400 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CheckCircle, User, Heart, Star, Brain, MessageCircle } from 'lucide-react'
 
-const questions = [
+interface ConversationalQuestion {
+    id: string
+    type: 'select' | 'text' | 'textarea' | 'scale'
+    question: string
+    subtitle?: string
+    category: string
+    options?: { value: string; label: string; emoji?: string }[]
+    placeholder?: string
+    scaleLabels?: { min: string; max: string }
+}
+
+// Hybrid conversational questions (10-12 total)
+const conversationalQuestions: ConversationalQuestion[] = [
+    // Character Inspiration & Basic Preferences (Questions 1-3)
     {
-        id: 1,
-        dimension: 'openness',
-        question: "I enjoy exploring new ideas and concepts, even if they seem unconventional.",
-        category: "Openness to Experience"
+        id: 'favorite_character',
+        type: 'text',
+        question: "Who's your favorite fictional character?",
+        subtitle: "This could be from any anime, movie, book, game, or TV show",
+        category: "Character Inspiration",
+        placeholder: "e.g., Hermione Granger, Gojo Satoru, Tyrion Lannister..."
     },
     {
-        id: 2,
-        dimension: 'conscientiousness',
-        question: "I prefer to plan my activities well in advance rather than being spontaneous.",
-        category: "Conscientiousness"
+        id: 'character_source',
+        type: 'text',
+        question: "What are they from?",
+        subtitle: "The series, movie, book, or game where this character appears",
+        category: "Character Inspiration",
+        placeholder: "e.g., Harry Potter, Jujutsu Kaisen, Game of Thrones..."
     },
     {
-        id: 3,
-        dimension: 'extraversion',
-        question: "I feel energized when I'm around other people and in social situations.",
-        category: "Extraversion"
+        id: 'companion_gender',
+        type: 'text',
+        question: "What gender would you like your AI companion to be?",
+        subtitle: "Just type whatever feels right to you",
+        category: "Companion Preferences",
+        placeholder: "e.g., female, male, non-binary, doesn't matter..."
+    },
+
+    // User's Personality & Emotional Needs (Questions 4-7)
+    {
+        id: 'emotional_support_need',
+        type: 'select',
+        question: "When you're going through something difficult, what do you need most?",
+        subtitle: "Think about what actually helps you feel better",
+        category: "Emotional Needs",
+        options: [
+            { value: 'someone_listen', label: 'Someone to listen and understand', emoji: '👂' },
+            { value: 'practical_help', label: 'Practical advice and solutions', emoji: '💡' },
+            { value: 'distraction_fun', label: 'Distraction and something fun', emoji: '🎉' },
+            { value: 'gentle_encouragement', label: 'Gentle encouragement and motivation', emoji: '🌟' }
+        ]
     },
     {
-        id: 4,
-        dimension: 'agreeableness',
-        question: "I tend to trust others and believe people generally have good intentions.",
-        category: "Agreeableness"
+        id: 'social_energy',
+        type: 'select',
+        question: "How do you typically recharge and feel your best?",
+        subtitle: "What gives you energy vs. what drains you?",
+        category: "Personal Energy",
+        options: [
+            { value: 'alone_time', label: 'Quiet time alone with my thoughts', emoji: '🌙' },
+            { value: 'deep_conversations', label: 'Deep, meaningful conversations', emoji: '💭' },
+            { value: 'social_interaction', label: 'Being around people and socializing', emoji: '👥' },
+            { value: 'creative_activities', label: 'Creative or hands-on activities', emoji: '🎨' }
+        ]
     },
     {
-        id: 5,
-        dimension: 'neuroticism',
-        question: "I often worry about things that might go wrong in the future.",
-        category: "Emotional Stability"
+        id: 'stress_response',
+        type: 'select',
+        question: "When you're stressed or overwhelmed, you tend to:",
+        subtitle: "Your natural response when things get tough",
+        category: "Coping Style",
+        options: [
+            { value: 'withdraw_process', label: 'Withdraw and process things internally', emoji: '🤔' },
+            { value: 'talk_it_out', label: 'Talk it out with someone I trust', emoji: '💬' },
+            { value: 'stay_busy', label: 'Stay busy and keep moving forward', emoji: '⚡' },
+            { value: 'seek_comfort', label: 'Seek comfort and reassurance', emoji: '🤗' }
+        ]
     },
     {
-        id: 6,
-        dimension: 'humor_style',
-        question: "I enjoy making others laugh, even if it means being a bit silly or absurd.",
-        category: "Humor Style"
+        id: 'relationship_values',
+        type: 'select',
+        question: "What do you value most in close relationships?",
+        subtitle: "The foundation that makes a relationship meaningful to you",
+        category: "Relationship Values",
+        options: [
+            { value: 'loyalty_trust', label: 'Loyalty and unwavering trust', emoji: '🛡️' },
+            { value: 'intellectual_connection', label: 'Intellectual connection and growth', emoji: '🧠' },
+            { value: 'emotional_intimacy', label: 'Deep emotional intimacy and understanding', emoji: '💙' },
+            { value: 'shared_adventures', label: 'Shared experiences and adventures', emoji: '🌍' }
+        ]
+    },
+
+    // Life Approach & Interests (Questions 8-10)
+    {
+        id: 'life_approach',
+        type: 'select',
+        question: "Which describes your general approach to life?",
+        subtitle: "How you tend to navigate the world",
+        category: "Life Philosophy",
+        options: [
+            { value: 'careful_thoughtful', label: 'Careful and thoughtful - I like to plan ahead', emoji: '📋' },
+            { value: 'spontaneous_adaptable', label: 'Spontaneous and adaptable - I go with the flow', emoji: '🌊' },
+            { value: 'ambitious_driven', label: 'Ambitious and driven - I pursue my goals actively', emoji: '🎯' },
+            { value: 'peaceful_content', label: 'Peaceful and content - I appreciate simple pleasures', emoji: '🌸' }
+        ]
     },
     {
-        id: 7,
-        dimension: 'communication_style',
-        question: "I prefer direct, straightforward communication over subtle hints.",
-        category: "Communication Style"
+        id: 'curiosity_style',
+        type: 'select',
+        question: "What kind of topics genuinely fascinate you?",
+        subtitle: "What makes you light up when discussing it?",
+        category: "Intellectual Interests",
+        options: [
+            { value: 'people_psychology', label: 'People, psychology, and human nature', emoji: '🧭' },
+            { value: 'ideas_philosophy', label: 'Big ideas, philosophy, and meaning', emoji: '🌌' },
+            { value: 'creative_arts', label: 'Creative arts, stories, and imagination', emoji: '🎭' },
+            { value: 'practical_world', label: 'How things work and practical knowledge', emoji: '⚙️' }
+        ]
     },
     {
-        id: 8,
-        dimension: 'relationship_style',
-        question: "I prefer having a few close relationships rather than many casual friendships.",
-        category: "Relationship Style"
+        id: 'what_attracts_character',
+        type: 'textarea',
+        question: "What specifically draws you to your favorite character?",
+        subtitle: "The traits, qualities, or aspects of their personality that resonate with you",
+        category: "Character Connection",
+        placeholder: "Their strength in adversity, their loyalty to friends, their intelligence and wit, their complexity..."
     },
-    // Second round of questions
+
+    // Companion Relationship Dynamics (Questions 11-12)
     {
-        id: 9,
-        dimension: 'openness',
-        question: "I often question established traditions and ways of doing things.",
-        category: "Openness to Experience"
-    },
-    {
-        id: 10,
-        dimension: 'conscientiousness',
-        question: "I am known for being reliable and following through on my commitments.",
-        category: "Conscientiousness"
-    },
-    {
-        id: 11,
-        dimension: 'extraversion',
-        question: "I often take the lead in group situations and enjoy being the center of attention.",
-        category: "Extraversion"
+        id: 'ideal_companion_role',
+        type: 'select',
+        question: "What role would you want your ideal companion to play in your life?",
+        subtitle: "Think about what would be most meaningful to you",
+        category: "Companion Role",
+        options: [
+            { value: 'trusted_confidant', label: 'A trusted confidant who truly knows me', emoji: '🤝' },
+            { value: 'intellectual_partner', label: 'An intellectual partner who challenges my thinking', emoji: '🎓' },
+            { value: 'emotional_support', label: 'A source of emotional support and comfort', emoji: '💝' },
+            { value: 'adventure_companion', label: 'A companion for life\'s adventures and experiences', emoji: '🗺️' }
+        ]
     },
     {
-        id: 12,
-        dimension: 'agreeableness',
-        question: "I find it easy to empathize with others and understand their perspectives.",
-        category: "Agreeableness"
-    },
-    {
-        id: 13,
-        dimension: 'neuroticism',
-        question: "I remain calm and composed even in stressful or challenging situations.",
-        category: "Emotional Stability"
-    },
-    {
-        id: 14,
-        dimension: 'humor_style',
-        question: "I appreciate witty, clever humor more than slapstick or physical comedy.",
-        category: "Humor Style"
-    },
-    {
-        id: 15,
-        dimension: 'communication_style',
-        question: "I enjoy long, detailed conversations about topics that interest me.",
-        category: "Communication Style"
-    },
-    {
-        id: 16,
-        dimension: 'relationship_style',
-        question: "I value loyalty and long-term commitment in my relationships.",
-        category: "Relationship Style"
+        id: 'connection_pace',
+        type: 'select',
+        question: "How do you naturally form deep connections?",
+        subtitle: "Your authentic way of building meaningful relationships",
+        category: "Connection Style",
+        options: [
+            { value: 'gradual_trust', label: 'Gradually, as trust builds over time', emoji: '🌱' },
+            { value: 'instant_chemistry', label: 'Quickly when there\'s natural chemistry', emoji: '✨' },
+            { value: 'shared_experiences', label: 'Through shared experiences and memories', emoji: '📸' },
+            { value: 'deep_conversations', label: 'Through meaningful conversations and vulnerability', emoji: '💭' }
+        ]
     }
 ]
 
-const responseOptions = [
-    { value: 1, label: "Strongly Disagree", color: "bg-red-100 text-red-800 border-red-200" },
-    { value: 2, label: "Disagree", color: "bg-orange-100 text-orange-800 border-orange-200" },
-    { value: 3, label: "Neutral", color: "bg-gray-100 text-gray-800 border-gray-200" },
-    { value: 4, label: "Agree", color: "bg-blue-100 text-blue-800 border-blue-200" },
-    { value: 5, label: "Strongly Agree", color: "bg-green-100 text-green-800 border-green-200" }
-]
+interface PersonalityResults {
+    preferences: Record<string, any>
+    personality: Record<string, number>
+    insights: string[]
+    conversationalStyle: {
+        communicationPreference: string
+        energyLevel: string
+        humorStyle: string
+        supportStyle: string
+        responseLength: string
+    }
+}
 
 interface PersonalityTestProps {
-    onComplete: (results: Record<string, number>) => void
+    onComplete: (results: PersonalityResults) => void
     onBack?: () => void
 }
 
 export default function PersonalityTest({ onComplete, onBack }: PersonalityTestProps) {
-    const [currentQuestion, setCurrentQuestion] = useState(0)
-    const [answers, setAnswers] = useState<Record<number, number>>({})
-    const [isCompleting, setIsCompleting] = useState(false)
+    const [phase, setPhase] = useState<'intro' | 'questions' | 'completing'>('intro')
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+    const [answers, setAnswers] = useState<Record<string, any>>({})
 
-    const handleAnswer = (questionId: number, value: number) => {
+    const currentQuestion = conversationalQuestions[currentQuestionIndex]
+    const progress = ((currentQuestionIndex + 1) / conversationalQuestions.length) * 100
+
+    const handleAnswer = (questionId: string, value: any) => {
         setAnswers(prev => ({ ...prev, [questionId]: value }))
     }
 
     const nextQuestion = () => {
-        if (currentQuestion < questions.length - 1) {
-            setCurrentQuestion(prev => prev + 1)
+        if (currentQuestionIndex < conversationalQuestions.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1)
         } else {
             handleComplete()
         }
     }
 
     const prevQuestion = () => {
-        if (currentQuestion > 0) {
-            setCurrentQuestion(prev => prev - 1)
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(prev => prev - 1)
         }
     }
 
     const handleComplete = async () => {
-        setIsCompleting(true)
+        setPhase('completing')
 
-        // Calculate personality scores
-        const dimensionScores: Record<string, number[]> = {}
+        // Process answers into personality insights
+        const insights = generatePersonalityInsights(answers)
+        const conversationalStyle = extractConversationalStyle(answers)
+        const personalityScores = calculatePersonalityScores(answers)
 
-        questions.forEach(question => {
-            const answer = answers[question.id]
-            if (answer) {
-                if (!dimensionScores[question.dimension]) {
-                    dimensionScores[question.dimension] = []
-                }
-                // Convert 1-5 scale to 0-1 scale, with special handling for neuroticism (reversed)
-                let normalizedScore = (answer - 1) / 4
-                if (question.dimension === 'neuroticism' && question.id === 13) {
-                    normalizedScore = 1 - normalizedScore // Reverse for emotional stability question
-                }
-                dimensionScores[question.dimension].push(normalizedScore)
-            }
-        })
+        // Simulate processing time
+        await new Promise(resolve => setTimeout(resolve, 2000))
 
-        // Average scores for each dimension
-        const results: Record<string, number> = {}
-        Object.entries(dimensionScores).forEach(([dimension, scores]) => {
-            results[dimension] = scores.reduce((sum, score) => sum + score, 0) / scores.length
-        })
-
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        const results: PersonalityResults = {
+            preferences: answers,
+            personality: personalityScores,
+            insights,
+            conversationalStyle
+        }
 
         onComplete(results)
     }
 
-    const progress = ((currentQuestion + 1) / questions.length) * 100
-    const isAnswered = answers[questions[currentQuestion].id] !== undefined
+    const generatePersonalityInsights = (answers: Record<string, any>) => {
+        const insights: string[] = []
 
-    if (isCompleting) {
+        // Emotional needs insights
+        if (answers.emotional_support_need === 'someone_listen') {
+            insights.push("You value being truly heard and understood above all else")
+        } else if (answers.emotional_support_need === 'practical_help') {
+            insights.push("You appreciate practical solutions and actionable advice")
+        } else if (answers.emotional_support_need === 'distraction_fun') {
+            insights.push("You cope best when you can shift focus to positive experiences")
+        }
+
+        // Social energy insights
+        if (answers.social_energy === 'alone_time') {
+            insights.push("You're introspective and recharge through solitude and reflection")
+        } else if (answers.social_energy === 'deep_conversations') {
+            insights.push("You're energized by meaningful, authentic connections")
+        } else if (answers.social_energy === 'social_interaction') {
+            insights.push("You thrive on social energy and interpersonal connections")
+        }
+
+        // Stress response insights
+        if (answers.stress_response === 'withdraw_process') {
+            insights.push("You're a thoughtful processor who needs space to work through challenges")
+        } else if (answers.stress_response === 'talk_it_out') {
+            insights.push("You find clarity and relief through open communication")
+        }
+
+        // Life approach insights
+        if (answers.life_approach === 'careful_thoughtful') {
+            insights.push("You're naturally cautious and prefer to think things through")
+        } else if (answers.life_approach === 'spontaneous_adaptable') {
+            insights.push("You're flexible and comfortable with uncertainty")
+        } else if (answers.life_approach === 'ambitious_driven') {
+            insights.push("You're goal-oriented and motivated by achievement")
+        }
+
+        // Character connection insights
+        if (answers.favorite_character && answers.what_attracts_character) {
+            insights.push(`Your admiration for ${answers.favorite_character} reveals you value ${answers.what_attracts_character.toLowerCase()}`)
+        }
+
+        // Relationship values insights
+        if (answers.relationship_values === 'loyalty_trust') {
+            insights.push("Loyalty and trust form the foundation of your meaningful relationships")
+        } else if (answers.relationship_values === 'intellectual_connection') {
+            insights.push("You seek partners who can engage with you intellectually and help you grow")
+        } else if (answers.relationship_values === 'emotional_intimacy') {
+            insights.push("Deep emotional connection and vulnerability are essential to you")
+        }
+
+        return insights
+    }
+
+    const extractConversationalStyle = (answers: Record<string, any>) => {
+        return {
+            communicationPreference: answers.curiosity_style || 'balanced',
+            energyLevel: answers.social_energy || 'moderate',
+            humorStyle: 'character_determined', // Let character personality determine this
+            supportStyle: answers.emotional_support_need || 'empathetic',
+            responseLength: 'character_determined' // Let character personality determine this
+        }
+    }
+
+    const calculatePersonalityScores = (answers: Record<string, any>) => {
+        const scores: Record<string, number> = {}
+
+        // Map answers to Big Five personality dimensions
+
+        // Openness to Experience
+        if (answers.curiosity_style === 'ideas_philosophy') scores.openness = 0.9
+        if (answers.curiosity_style === 'creative_arts') scores.openness = 0.8
+        if (answers.life_approach === 'spontaneous_adaptable') scores.openness = (scores.openness || 0) + 0.3
+
+        // Extraversion
+        if (answers.social_energy === 'social_interaction') scores.extraversion = 0.8
+        if (answers.social_energy === 'deep_conversations') scores.extraversion = 0.6
+        if (answers.social_energy === 'alone_time') scores.extraversion = 0.2
+
+        // Conscientiousness
+        if (answers.life_approach === 'careful_thoughtful') scores.conscientiousness = 0.8
+        if (answers.life_approach === 'ambitious_driven') scores.conscientiousness = 0.7
+        if (answers.connection_pace === 'gradual_trust') scores.conscientiousness = (scores.conscientiousness || 0) + 0.2
+
+        // Agreeableness
+        if (answers.emotional_support_need === 'someone_listen') scores.agreeableness = 0.8
+        if (answers.relationship_values === 'emotional_intimacy') scores.agreeableness = 0.7
+        if (answers.stress_response === 'seek_comfort') scores.agreeableness = (scores.agreeableness || 0) + 0.2
+
+        // Neuroticism (emotional stability - lower scores = more stable)
+        if (answers.stress_response === 'withdraw_process') scores.neuroticism = 0.6
+        if (answers.stress_response === 'stay_busy') scores.neuroticism = 0.4
+        if (answers.life_approach === 'peaceful_content') scores.neuroticism = 0.3
+
+        return scores
+    }
+
+    const isCurrentAnswered = () => {
+        return answers[currentQuestion.id] !== undefined && answers[currentQuestion.id] !== ''
+    }
+
+    // Intro Phase
+    if (phase === 'intro') {
+        return (
+            <div className="min-h-screen flex items-center justify-center px-6">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="glass-card rounded-3xl p-8 max-w-2xl mx-auto text-center"
+                >
+                    <div className="flex justify-center mb-6">
+                        <div className="p-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full">
+                            <MessageCircle className="h-12 w-12 text-white" />
+                        </div>
+                    </div>
+
+                    <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                        Let&apos;s Create Your Perfect Companion
+                    </h1>
+
+                    <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                        I&apos;m excited to help you find your ideal AI companion! I just have a few quick questions
+                        about what you enjoy most in conversation. This feels more like a friendly chat than a test.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div className="p-4 bg-blue-50 rounded-xl">
+                            <User className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                            <h3 className="font-semibold text-gray-900 mb-1">Your Style</h3>
+                            <p className="text-sm text-gray-600">How you like to communicate</p>
+                        </div>
+
+                        <div className="p-4 bg-purple-50 rounded-xl">
+                            <Heart className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                            <h3 className="font-semibold text-gray-900 mb-1">Your Inspiration</h3>
+                            <p className="text-sm text-gray-600">Characters you connect with</p>
+                        </div>
+
+                        <div className="p-4 bg-pink-50 rounded-xl">
+                            <Star className="h-8 w-8 text-pink-600 mx-auto mb-2" />
+                            <h3 className="font-semibold text-gray-900 mb-1">Perfect Match</h3>
+                            <p className="text-sm text-gray-600">Your ideal companion traits</p>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4 justify-center">
+                        {onBack && (
+                            <button
+                                onClick={onBack}
+                                className="px-6 py-3 text-gray-600 hover:text-gray-800 transition-colors"
+                            >
+                                ← Back
+                            </button>
+                        )}
+
+                        <button
+                            onClick={() => setPhase('questions')}
+                            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                        >
+                            Ready to Start! 🚀
+                        </button>
+                    </div>
+                </motion.div>
+            </div>
+        )
+    }
+
+    // Completing Phase
+    if (phase === 'completing') {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <motion.div
@@ -184,43 +403,39 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                     animate={{ opacity: 1, scale: 1 }}
                     className="glass-card rounded-2xl p-12 text-center max-w-md mx-auto"
                 >
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto mb-6"></div>
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-6"></div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        Analyzing Your Personality
+                        Creating Your Perfect Companion
                     </h3>
                     <p className="text-gray-600">
-                        Creating your unique personality profile...
+                        Analyzing your personality and preferences to craft the ideal match...
                     </p>
                 </motion.div>
             </div>
         )
     }
 
+    // Questions Phase
     return (
         <div className="min-h-screen py-8 px-6">
             <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                        Personality Assessment
-                    </h1>
-                    <p className="text-gray-600">
-                        Answer 16 questions to discover your perfect AI companion
-                    </p>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="mb-8">
-                    <div className="flex justify-between text-sm text-gray-600 mb-2">
-                        <span>Question {currentQuestion + 1} of {questions.length}</span>
-                        <span>{Math.round(progress)}% Complete</span>
+                    <div className="flex items-center justify-center gap-2 mb-4">
+                        <span className="text-sm font-medium text-purple-600">
+                            Question {currentQuestionIndex + 1} of {conversationalQuestions.length}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                            • {currentQuestion.category}
+                        </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+
+                    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
                         <motion.div
-                            className="bg-primary-600 h-2 rounded-full"
+                            className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full"
                             initial={{ width: 0 }}
                             animate={{ width: `${progress}%` }}
-                            transition={{ duration: 0.3 }}
+                            transition={{ duration: 0.5 }}
                         />
                     </div>
                 </div>
@@ -228,42 +443,68 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                 {/* Question Card */}
                 <AnimatePresence mode="wait">
                     <motion.div
-                        key={currentQuestion}
+                        key={currentQuestionIndex}
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.3 }}
                         className="glass-card rounded-2xl p-8 mb-8"
                     >
-                        <div className="mb-6">
-                            <div className="text-sm font-medium text-primary-600 mb-2">
-                                {questions[currentQuestion].category}
-                            </div>
-                            <h2 className="text-xl font-semibold text-gray-900 leading-relaxed">
-                                {questions[currentQuestion].question}
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-semibold text-gray-900 leading-relaxed mb-3">
+                                {currentQuestion.question}
                             </h2>
+                            {currentQuestion.subtitle && (
+                                <p className="text-gray-600 text-lg">
+                                    {currentQuestion.subtitle}
+                                </p>
+                            )}
                         </div>
 
-                        <div className="space-y-3">
-                            {responseOptions.map((option) => (
-                                <motion.button
-                                    key={option.value}
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={() => handleAnswer(questions[currentQuestion].id, option.value)}
-                                    className={`w-full p-4 rounded-lg border-2 text-left transition-all duration-200 ${answers[questions[currentQuestion].id] === option.value
-                                            ? `${option.color} border-current shadow-md`
-                                            : 'bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                        }`}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-medium">{option.label}</span>
-                                        {answers[questions[currentQuestion].id] === option.value && (
-                                            <CheckCircle className="w-5 h-5" />
-                                        )}
-                                    </div>
-                                </motion.button>
-                            ))}
+                        {/* Answer Options */}
+                        <div className="space-y-4">
+                            {currentQuestion.type === 'select' ? (
+                                <div className="space-y-3">
+                                    {currentQuestion.options?.map((option) => (
+                                        <button
+                                            key={option.value}
+                                            onClick={() => handleAnswer(currentQuestion.id, option.value)}
+                                            className={`w-full p-4 rounded-xl border-2 transition-all duration-200 text-left ${answers[currentQuestion.id] === option.value
+                                                ? 'border-purple-500 bg-purple-50 text-purple-900'
+                                                : 'border-gray-200 hover:border-purple-300 hover:bg-purple-25'
+                                                }`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    {option.emoji && (
+                                                        <span className="text-2xl">{option.emoji}</span>
+                                                    )}
+                                                    <span className="font-medium">{option.label}</span>
+                                                </div>
+                                                {answers[currentQuestion.id] === option.value && (
+                                                    <CheckCircle className="h-5 w-5 text-purple-600" />
+                                                )}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : currentQuestion.type === 'text' ? (
+                                <input
+                                    type="text"
+                                    placeholder={currentQuestion.placeholder}
+                                    value={answers[currentQuestion.id] || ''}
+                                    onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
+                                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none text-lg"
+                                />
+                            ) : (
+                                <textarea
+                                    placeholder={currentQuestion.placeholder}
+                                    value={answers[currentQuestion.id] || ''}
+                                    onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
+                                    rows={4}
+                                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none text-lg resize-none"
+                                />
+                            )}
                         </div>
                     </motion.div>
                 </AnimatePresence>
@@ -271,23 +512,27 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                 {/* Navigation */}
                 <div className="flex justify-between items-center">
                     <button
-                        onClick={currentQuestion === 0 ? onBack : prevQuestion}
-                        className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors"
+                        onClick={prevQuestion}
+                        disabled={currentQuestionIndex === 0}
+                        className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                        <ChevronLeft className="w-5 h-5" />
-                        {currentQuestion === 0 ? 'Back to Home' : 'Previous'}
+                        <ChevronLeft className="h-4 w-4" />
+                        Previous
                     </button>
 
                     <button
                         onClick={nextQuestion}
-                        disabled={!isAnswered}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${isAnswered
-                                ? 'bg-primary-600 hover:bg-primary-700 text-white shadow-lg hover:shadow-xl'
-                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                            }`}
+                        disabled={!isCurrentAnswered()}
+                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
-                        {currentQuestion === questions.length - 1 ? 'Complete Assessment' : 'Next Question'}
-                        <ChevronRight className="w-5 h-5" />
+                        {currentQuestionIndex === conversationalQuestions.length - 1 ? (
+                            <>Create My Companion! ✨</>
+                        ) : (
+                            <>
+                                Next
+                                <ChevronRight className="h-4 w-4" />
+                            </>
+                        )}
                     </button>
                 </div>
             </div>

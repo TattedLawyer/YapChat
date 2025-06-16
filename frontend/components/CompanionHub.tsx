@@ -8,8 +8,6 @@ import {
     Star,
     Calendar,
     BookOpen,
-    Settings,
-    Home,
     ArrowLeft,
     Sparkles,
     Gift
@@ -52,79 +50,50 @@ const getTimeBasedGreeting = () => {
     return "Good evening"
 }
 
-const getTimeBasedBackground = (characterId: string) => {
+const getTimeBasedBackground = () => {
     const hour = new Date().getHours()
-    const baseGradients = {
-        aria: {
-            morning: 'from-pink-100 via-rose-50 to-orange-100',
-            afternoon: 'from-pink-50 via-rose-100 to-pink-200',
-            evening: 'from-purple-100 via-pink-100 to-indigo-200'
-        },
-        sage: {
-            morning: 'from-green-100 via-emerald-50 to-teal-100',
-            afternoon: 'from-green-50 via-emerald-100 to-green-200',
-            evening: 'from-blue-100 via-green-100 to-teal-200'
-        },
-        riley: {
-            morning: 'from-orange-100 via-yellow-50 to-amber-100',
-            afternoon: 'from-orange-50 via-yellow-100 to-orange-200',
-            evening: 'from-red-100 via-orange-100 to-pink-200'
-        },
-        alex: {
-            morning: 'from-purple-100 via-violet-50 to-indigo-100',
-            afternoon: 'from-purple-50 via-violet-100 to-purple-200',
-            evening: 'from-indigo-100 via-purple-100 to-violet-200'
-        }
-    }
 
-    const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
-    return baseGradients[characterId as keyof typeof baseGradients]?.[timeOfDay] || 'from-blue-50 to-purple-50'
+    // Use time-based gradients for all characters
+    if (hour < 12) {
+        return 'from-blue-100 via-indigo-50 to-purple-100'
+    } else if (hour < 17) {
+        return 'from-purple-50 via-pink-100 to-rose-200'
+    } else {
+        return 'from-indigo-100 via-purple-100 to-pink-200'
+    }
 }
 
-const getCharacterMood = (characterId: string, relationshipLevel: number) => {
-    const moods = {
-        aria: {
-            1: "I guess... you're not completely hopeless. 💗",
-            2: "You're actually kind of interesting, but don't let it go to your head! 😤",
-            3: "Maybe I do enjoy our time together... just a little bit! 💕"
-        },
-        sage: {
-            1: "Our journey together has just begun, young one. I sense great potential. 🌱",
-            2: "Your wisdom grows with each passing day. I am honored to guide you. 🌟",
-            3: "You have become a true friend and student. Our bond runs deep. 💫"
-        },
-        riley: {
-            1: "This is so exciting! We're going to have the BEST time together! 🎉",
-            2: "You're like, the coolest person ever! I love hanging out with you! ✨",
-            3: "You're my absolute favorite human! Best friends forever! 💖"
-        },
-        alex: {
-            1: "There's something magnetic about you... I'm drawn to your essence. 💜",
-            2: "Your soul speaks to mine in ways I never expected. Beautiful. 🌙",
-            3: "We are connected by something deeper than words can express. ✨"
-        }
+const getCharacterMood = (character: any, relationshipLevel: number) => {
+    // Use character's voice or generate based on personality
+    const profile = character.profile
+    if (profile?.character_voice) {
+        return profile.character_voice
     }
 
-    return moods[characterId as keyof typeof moods]?.[relationshipLevel as keyof typeof moods.aria] ||
-        moods[characterId as keyof typeof moods]?.[1] ||
-        "Hello, dear friend."
+    // Generate mood based on relationship level
+    const levelMoods = [
+        "Nice to meet you! I'm looking forward to getting to know you better.",
+        "I'm really enjoying our conversations together!",
+        "You've become such an important part of my day. Thank you for being here."
+    ]
+
+    return levelMoods[Math.min(relationshipLevel - 1, levelMoods.length - 1)] || levelMoods[0]
 }
 
 export default function CompanionHub({
     character,
     relationshipData,
     onStartChat,
-    onBack,
-    onUpdateRelationship
+    onBack
 }: CompanionHubProps) {
     const [showMemories, setShowMemories] = useState(false)
     const [characterMood, setCharacterMood] = useState('')
 
     useEffect(() => {
-        setCharacterMood(getCharacterMood(character.id, relationshipData.level))
-    }, [character.id, relationshipData.level])
+        setCharacterMood(getCharacterMood(character, relationshipData.level))
+    }, [character, relationshipData.level])
 
-    const timeBasedBg = getTimeBasedBackground(character.id)
+    const timeBasedBg = getTimeBasedBackground()
     const greeting = getTimeBasedGreeting()
 
     const experienceToNextLevel = relationshipData.level * 100
@@ -148,7 +117,9 @@ export default function CompanionHub({
         {
             icon: Gift,
             label: 'Activities',
-            action: () => { }, // TODO: Implement activities
+            action: () => {
+                alert('Activities feature coming soon! More interactive experiences will be added in future updates.')
+            },
             color: 'bg-green-500 hover:bg-green-600',
             description: 'Fun activities together',
             disabled: !relationshipData.unlockedContent.includes('activities')
@@ -198,7 +169,7 @@ export default function CompanionHub({
                     </motion.div>
 
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                        {greeting}, it's {character.name}!
+                        {greeting}, it&apos;s {character.name}!
                     </h1>
 
                     <motion.p
@@ -254,7 +225,7 @@ export default function CompanionHub({
                     transition={{ delay: 0.4 }}
                     className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8"
                 >
-                    {quickActions.map((action, index) => (
+                    {quickActions.map((action) => (
                         <motion.button
                             key={action.label}
                             onClick={action.action}
