@@ -6,25 +6,25 @@ import { Heart, Sparkles, ArrowRight, Star, Search, Wand2 } from 'lucide-react'
 
 const demoCharacters = [
     {
-        id: 'demo_nico_robin',
-        name: 'Nico Robin',
-        series: 'One Piece',
-        description: 'Intelligent archaeologist with dark humor',
+        id: 'demo_nezuko',
+        name: 'Nezuko Kamado',
+        series: 'Demon Slayer',
+        description: 'Protective demon sister with gentle heart',
         icon: '🌸',
     },
     {
         id: 'demo_gojo',
         name: 'Satoru Gojo',
         series: 'Jujutsu Kaisen',
-        description: 'Confident strongest sorcerer',
+        description: 'Strongest sorcerer with playful confidence',
         icon: '👁️',
     },
     {
-        id: 'demo_hermione',
-        name: 'Hermione Granger',
-        series: 'Harry Potter',
-        description: 'Brilliant and loyal witch',
-        icon: '📚',
+        id: 'demo_zero_two',
+        name: 'Zero Two',
+        series: 'Darling in the Franxx',
+        description: 'Mysterious darling with horns and attitude',
+        icon: '💕',
     }
 ]
 
@@ -73,14 +73,14 @@ export default function HomePage({ onStartPersonalityTest, onCreateCustomCharact
                         className="text-center"
                     >
                         <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-                            Chat With Any
+                            ✨ Welcome to
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-purple-600">
-                                {' '}Fictional Character
+                                {' '}YapChat
                             </span>
                         </h1>
                         <p className="mt-6 text-lg leading-8 text-gray-600 max-w-3xl mx-auto">
-                            Describe any character from anime, movies, books, games, or TV shows. Our AI will research their personality
-                            and become them for authentic conversations.
+                            🌟 Summon any anime, manga, or fantasy character! Our magical AI will research their essence
+                            and bring them to life for epic conversations that feel like stepping into their world.
                         </p>
 
                         {/* Character Input Section */}
@@ -88,13 +88,13 @@ export default function HomePage({ onStartPersonalityTest, onCreateCustomCharact
                             <div className="glass-card rounded-2xl p-8">
                                 <div className="flex items-center gap-3 mb-4">
                                     <Wand2 className="w-6 h-6 text-primary-600" />
-                                    <h3 className="text-xl font-semibold text-gray-900">Describe Your Character</h3>
+                                    <h3 className="text-xl font-semibold text-gray-900">✨ Summon Your Character</h3>
                                 </div>
 
                                 <textarea
                                     value={characterInput}
                                     onChange={(e) => setCharacterInput(e.target.value)}
-                                    placeholder="Example: Kakashi Hatake from Naruto - the laid-back but skilled ninja sensei who loves reading and is always late..."
+                                    placeholder="Example: Nezuko Kamado from Demon Slayer - the protective demon sister who shows affection through headpats and bamboo muzzle..."
                                     className="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     disabled={isCreating}
                                 />
@@ -112,7 +112,7 @@ export default function HomePage({ onStartPersonalityTest, onCreateCustomCharact
                                     ) : (
                                         <>
                                             <Search className="w-5 h-5" />
-                                            Create & Chat
+                                            🌟 Summon & Chat
                                         </>
                                     )}
                                 </button>
@@ -124,7 +124,7 @@ export default function HomePage({ onStartPersonalityTest, onCreateCustomCharact
                                 onClick={onStartPersonalityTest}
                                 className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors"
                             >
-                                Take Personality Test <span aria-hidden="true">→</span>
+                                ✨ Take Soul Assessment <span aria-hidden="true">→</span>
                             </button>
                         </div>
                     </motion.div>
@@ -138,18 +138,18 @@ export default function HomePage({ onStartPersonalityTest, onCreateCustomCharact
                     >
                         <div className="glass-card rounded-2xl p-8 text-center">
                             <Search className="w-12 h-12 text-primary-600 mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">AI Research</h3>
-                            <p className="text-gray-600">Our AI researches your character&apos;s personality, backstory, and mannerisms from their source material.</p>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">🔮 Magical Research</h3>
+                            <p className="text-gray-600">Our AI channels deep knowledge of anime, manga, and fantasy universes to capture each character&apos;s true essence.</p>
                         </div>
                         <div className="glass-card rounded-2xl p-8 text-center">
                             <Heart className="w-12 h-12 text-pink-600 mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Authentic Personality</h3>
-                            <p className="text-gray-600">Experience genuine conversations with characters who respond exactly as fans would expect.</p>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">⚡ Authentic Souls</h3>
+                            <p className="text-gray-600">Experience genuine conversations with characters who embody their true personality, powers, and quirks.</p>
                         </div>
                         <div className="glass-card rounded-2xl p-8 text-center">
                             <Sparkles className="w-12 h-12 text-purple-600 mx-auto mb-4" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Infinite Possibilities</h3>
-                            <p className="text-gray-600">Any character from any story, game, anime, movie, or book - the choice is entirely yours.</p>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">🌟 Infinite Realms</h3>
+                            <p className="text-gray-600">Any character from anime, manga, light novels, games, or fantasy worlds - your imagination is the only limit!</p>
                         </div>
                     </motion.div>
                 </div>
@@ -166,10 +166,10 @@ export default function HomePage({ onStartPersonalityTest, onCreateCustomCharact
                         className="text-center mb-12"
                     >
                         <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-4">
-                            Try These Demo Characters
+                            ✨ Try These Demo Characters
                         </h2>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Click any character below to auto-fill the description, or create your own from scratch.
+                            🌟 Click any character below to auto-fill their description, or summon your own favorite from any anime or fantasy world!
                         </p>
                     </motion.div>
 
@@ -190,7 +190,7 @@ export default function HomePage({ onStartPersonalityTest, onCreateCustomCharact
                                     <p className="text-xs text-gray-500 mb-3">from {character.series}</p>
                                     <p className="text-gray-600 text-sm mb-4">{character.description}</p>
                                     <button className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-                                        Use This Character →
+                                        ✨ Summon This Character →
                                     </button>
                                 </div>
                             </motion.div>

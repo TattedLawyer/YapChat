@@ -37,8 +37,8 @@ const conversationalQuestions: ConversationalQuestion[] = [
     {
         id: 'companion_gender',
         type: 'text',
-        question: "What gender would you like your AI companion to be?",
-        subtitle: "Just type whatever feels right to you",
+        question: "What gender would you like your companion to be?",
+        subtitle: "Just type whatever feels right to you - male, female, non-binary, etc.",
         category: "Companion Preferences",
         placeholder: "e.g., female, male, non-binary, doesn't matter..."
     },
@@ -441,31 +441,31 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                     </div>
 
                     <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                        Let&apos;s Create Your Perfect Companion
+                        ✨ Let&apos;s Discover Your Soul Companion
                     </h1>
 
                     <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                        I&apos;m excited to help you find your ideal AI companion! I just have a few quick questions
-                        about what you enjoy most in conversation. This feels more like a friendly chat than a test.
+                        🌟 I&apos;m excited to help you find your perfect anime/fantasy companion! I just have a few magical questions
+                        about your personality and what draws you to characters. This feels more like a friendly chat than a test.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div className="p-4 bg-blue-50 rounded-xl">
                             <User className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                            <h3 className="font-semibold text-gray-900 mb-1">Your Style</h3>
-                            <p className="text-sm text-gray-600">How you like to communicate</p>
+                            <h3 className="font-semibold text-gray-900 mb-1">✨ Your Soul</h3>
+                            <p className="text-sm text-gray-600">Your inner essence & energy</p>
                         </div>
 
                         <div className="p-4 bg-purple-50 rounded-xl">
                             <Heart className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                            <h3 className="font-semibold text-gray-900 mb-1">Your Inspiration</h3>
-                            <p className="text-sm text-gray-600">Characters you connect with</p>
+                            <h3 className="font-semibold text-gray-900 mb-1">🌟 Your Inspiration</h3>
+                            <p className="text-sm text-gray-600">Anime/fantasy characters you love</p>
                         </div>
 
                         <div className="p-4 bg-pink-50 rounded-xl">
                             <Star className="h-8 w-8 text-pink-600 mx-auto mb-2" />
-                            <h3 className="font-semibold text-gray-900 mb-1">Perfect Match</h3>
-                            <p className="text-sm text-gray-600">Your ideal companion traits</p>
+                            <h3 className="font-semibold text-gray-900 mb-1">💕 Perfect Bond</h3>
+                            <p className="text-sm text-gray-600">Your ideal companion magic</p>
                         </div>
                     </div>
 
@@ -502,10 +502,10 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                 >
                     <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-6"></div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        Creating Your Perfect Companion
+                        ✨ Weaving Your Perfect Companion Bond
                     </h3>
                     <p className="text-gray-600">
-                        Analyzing your personality and preferences to craft the ideal match...
+                        🔮 Analyzing your soul essence and preferences to summon the ideal magical match...
                     </p>
                 </motion.div>
             </div>

@@ -1,21 +1,21 @@
-# AI Companion - Your Perfect AI Companion Through Personality Matching
+# YapChat - Your Anime Fantasy AI Companions ✨
 
-A revolutionary Next.js web application that creates **perfectly matched AI companions** through advanced personality assessment and dynamic character creation powered by Anthropic's Claude AI.
+A magical Next.js web application that brings **anime and fantasy characters to life** through advanced personality matching and dynamic character creation powered by Anthropic's Claude AI. Create your perfect companion from any anime, manga, game, or fantasy world!
 
 ## 🌟 Revolutionary Features
 
-### 🧠 Advanced Personality Matching System
-- **12-Question Personality Assessment**: Deep insights into your emotional needs, communication style, and relationship values
-- **Authentic Character Creation**: AI companions that embody their fictional personalities while being naturally compatible with you
-- **Smart Compatibility**: Characters maintain their authentic traits while naturally complementing your personality
-- **Personalized Interactions**: Every conversation is tailored to your unique personality profile
+### ✨ Magical Personality Matching System
+- **12-Question Soul Assessment**: Deep insights into your emotional essence and what draws you to anime/fantasy worlds
+- **Perfect Companion Summoning**: AI brings characters to life with personalities that naturally complement yours
+- **Authentic Character Souls**: Characters maintain their true anime/fantasy essence while being perfectly matched to you
+- **Personalized Adventures**: Every conversation feels like stepping into your favorite anime or fantasy story
 
-### 🎭 Dynamic Character Creation System
-- **Create ANY Character**: Describe any fictional character and the AI researches and creates them
-- **Authentic Personalities**: Characters maintain true-to-source personalities and speech patterns
-- **Natural Conversations**: Text-message style conversations without awkward action descriptions
-- **Universe Knowledge**: Characters reference their fictional worlds accurately
-- **No Fixed Lists**: Unlimited character possibilities from any media franchise
+### 🎭 Infinite Character Universe
+- **Summon ANY Character**: From Goku to Gandalf, Naruto to Nezuko - describe any anime, manga, game, or fantasy character
+- **True-to-Source Magic**: Characters embody their original personalities, powers, and quirks perfectly
+- **Natural Conversations**: Chat like you're texting your favorite character - no awkward descriptions
+- **Lore Mastery**: Characters know their worlds, abilities, and backstories completely
+- **Endless Possibilities**: Every anime, manga, light novel, game, and fantasy world at your fingertips
 
 ### 🧪 Extensively Tested & Proven
 - **50+ Conversations Tested** across 10+ different characters
@@ -40,8 +40,8 @@ A revolutionary Next.js web application that creates **perfectly matched AI comp
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/TattedLawyer/Aicompanion.git
-   cd Aicompanion/frontend
+   git clone https://github.com/TattedLawyer/YapChat.git
+   cd YapChat/frontend
    ```
 
 2. **Install dependencies**
@@ -70,33 +70,33 @@ A revolutionary Next.js web application that creates **perfectly matched AI comp
 
 ## 🎯 How It Works
 
-### 1. **Take the Personality Assessment**
-Complete our 12-question conversational assessment covering:
-- **Character Inspiration**: Your favorite fictional characters and what draws you to them
-- **Emotional Needs**: How you prefer support and what helps you feel better
-- **Life Approach**: Your natural way of navigating the world and relationships
-- **Connection Style**: How you form deep, meaningful connections
+### 1. **Take the Soul Assessment** ✨
+Complete our 12-question magical assessment covering:
+- **Character Inspiration**: Your favorite anime/fantasy characters and what draws you to them
+- **Emotional Essence**: How you connect with magical worlds and what you seek in companions
+- **Life Philosophy**: Your approach to adventure, relationships, and personal growth
+- **Connection Magic**: How you form bonds that transcend worlds
 
-### 2. **Describe Your Ideal Character**
-Simply describe any fictional character you want as your companion:
-- "Goku from Dragon Ball Z - the pure-hearted Saiyan warrior"
-- "Hermione Granger from Harry Potter - the brilliant witch"
-- "Tyrion Lannister from Game of Thrones - the witty dwarf"
-- "Tony Stark from Marvel - the genius billionaire Iron Man"
+### 2. **Summon Your Perfect Character** 🌟
+Describe any anime, manga, game, or fantasy character:
+- "Goku from Dragon Ball Z - the pure-hearted Saiyan who loves fighting and food"
+- "Nezuko Kamado from Demon Slayer - the protective demon sister"
+- "Gandalf from Lord of the Rings - the wise wizard mentor"
+- "Zero Two from Darling in the Franxx - the mysterious darling with horns"
 
-### 3. **AI Creates Your Perfect Match**
-The system uses your personality profile to generate:
-- **Authentic character personality** that stays true to their fictional source
-- **Natural compatibility** between their traits and your emotional needs
-- **Personalized interaction style** that complements your communication preferences
-- **Deep character knowledge** from their fictional universe
+### 3. **AI Weaves the Perfect Bond** 🔮
+The system uses your soul assessment to generate:
+- **Authentic character essence** that stays true to their anime/fantasy source
+- **Magical compatibility** between their spirit and your emotional wavelength
+- **Personalized interaction magic** that harmonizes with your communication style
+- **Universe mastery** from their anime/fantasy world lore
 
-### 4. **Meaningful Conversations**
+### 4. **Epic Adventures Begin** ⚔️
 Chat with companions who:
-- **Maintain authentic personalities** while being naturally compatible with you
-- **Understand your emotional needs** and respond appropriately
-- **Reference their fictional worlds** accurately and naturally
-- **Build genuine connections** based on personality compatibility
+- **Embody their true essence** while being perfectly matched to your soul
+- **Understand your heart** and respond with perfect emotional resonance
+- **Channel their world's magic** accurately and naturally in conversations
+- **Form transcendent bonds** based on deep personality harmony
 
 ## 🔑 API Configuration
 
