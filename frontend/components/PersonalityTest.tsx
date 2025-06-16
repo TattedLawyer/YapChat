@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, CheckCircle, User, Heart, Star, Brain, Messa
 
 interface ConversationalQuestion {
     id: string
-    type: 'select' | 'text' | 'textarea' | 'scale'
+    type: 'select' | 'multiselect' | 'text' | 'textarea' | 'scale'
     question: string
     subtitle?: string
     category: string
@@ -85,9 +85,9 @@ const conversationalQuestions: ConversationalQuestion[] = [
     },
     {
         id: 'relationship_values',
-        type: 'select',
-        question: "What do you value most in close relationships?",
-        subtitle: "The foundation that makes a relationship meaningful to you",
+        type: 'multiselect',
+        question: "What do you value in close relationships?",
+        subtitle: "Select all that are important to you - you can choose multiple",
         category: "Relationship Values",
         options: [
             { value: 'loyalty_trust', label: 'Loyalty and unwavering trust', emoji: '🛡️' },
@@ -269,13 +269,21 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
             insights.push(`Your admiration for ${answers.favorite_character} reveals you value ${answers.what_attracts_character.toLowerCase()}`)
         }
 
-        // Relationship values insights
-        if (answers.relationship_values === 'loyalty_trust') {
-            insights.push("Loyalty and trust form the foundation of your meaningful relationships")
-        } else if (answers.relationship_values === 'intellectual_connection') {
-            insights.push("You seek partners who can engage with you intellectually and help you grow")
-        } else if (answers.relationship_values === 'emotional_intimacy') {
-            insights.push("Deep emotional connection and vulnerability are essential to you")
+        // Relationship values insights (can be multiple)
+        if (answers.relationship_values && Array.isArray(answers.relationship_values)) {
+            const values = answers.relationship_values
+            if (values.includes('loyalty_trust')) {
+                insights.push("Loyalty and trust form the foundation of your meaningful relationships")
+            }
+            if (values.includes('intellectual_connection')) {
+                insights.push("You seek partners who can engage with you intellectually and help you grow")
+            }
+            if (values.includes('emotional_intimacy')) {
+                insights.push("Deep emotional connection and vulnerability are essential to you")
+            }
+            if (values.includes('shared_adventures')) {
+                insights.push("You value shared experiences and creating memories together")
+            }
         }
 
         return insights
@@ -313,7 +321,14 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
 
         // Agreeableness
         if (answers.emotional_support_need === 'someone_listen') scores.agreeableness = 0.8
-        if (answers.relationship_values === 'emotional_intimacy') scores.agreeableness = 0.7
+        if (answers.relationship_values && Array.isArray(answers.relationship_values)) {
+            if (answers.relationship_values.includes('emotional_intimacy')) {
+                scores.agreeableness = (scores.agreeableness || 0) + 0.7
+            }
+            if (answers.relationship_values.includes('loyalty_trust')) {
+                scores.agreeableness = (scores.agreeableness || 0) + 0.3
+            }
+        }
         if (answers.stress_response === 'seek_comfort') scores.agreeableness = (scores.agreeableness || 0) + 0.2
 
         // Neuroticism (emotional stability - lower scores = more stable)
@@ -325,7 +340,11 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
     }
 
     const isCurrentAnswered = () => {
-        return answers[currentQuestion.id] !== undefined && answers[currentQuestion.id] !== ''
+        const answer = answers[currentQuestion.id]
+        if (currentQuestion.type === 'multiselect') {
+            return Array.isArray(answer) && answer.length > 0
+        }
+        return answer !== undefined && answer !== ''
     }
 
     // Intro Phase
@@ -487,6 +506,45 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                                             </div>
                                         </button>
                                     ))}
+                                </div>
+                            ) : currentQuestion.type === 'multiselect' ? (
+                                <div className="space-y-3">
+                                    {currentQuestion.options?.map((option) => {
+                                        const selectedValues = answers[currentQuestion.id] || []
+                                        const isSelected = selectedValues.includes(option.value)
+
+                                        return (
+                                            <button
+                                                key={option.value}
+                                                onClick={() => {
+                                                    const currentValues = answers[currentQuestion.id] || []
+                                                    let newValues
+                                                    if (isSelected) {
+                                                        newValues = currentValues.filter((v: string) => v !== option.value)
+                                                    } else {
+                                                        newValues = [...currentValues, option.value]
+                                                    }
+                                                    handleAnswer(currentQuestion.id, newValues)
+                                                }}
+                                                className={`w-full p-4 rounded-xl border-2 transition-all duration-200 text-left ${isSelected
+                                                    ? 'border-purple-500 bg-purple-50 text-purple-900'
+                                                    : 'border-gray-200 hover:border-purple-300 hover:bg-purple-25'
+                                                    }`}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        {option.emoji && (
+                                                            <span className="text-2xl">{option.emoji}</span>
+                                                        )}
+                                                        <span className="font-medium">{option.label}</span>
+                                                    </div>
+                                                    {isSelected && (
+                                                        <CheckCircle className="h-5 w-5 text-purple-600" />
+                                                    )}
+                                                </div>
+                                            </button>
+                                        )
+                                    })}
                                 </div>
                             ) : currentQuestion.type === 'text' ? (
                                 <input

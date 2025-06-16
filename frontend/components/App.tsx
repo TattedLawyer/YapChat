@@ -156,7 +156,11 @@ export default function App() {
             enhancedPrompt += `- Stress response: ${preferences.stress_response}\n`
         }
         if (preferences.relationship_values) {
-            enhancedPrompt += `- Values in relationships: ${preferences.relationship_values}\n`
+            if (Array.isArray(preferences.relationship_values)) {
+                enhancedPrompt += `- Values in relationships: ${preferences.relationship_values.join(', ')}\n`
+            } else {
+                enhancedPrompt += `- Values in relationships: ${preferences.relationship_values}\n`
+            }
         }
         if (preferences.life_approach) {
             enhancedPrompt += `- Life approach: ${preferences.life_approach}\n`
