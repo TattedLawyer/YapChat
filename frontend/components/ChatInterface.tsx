@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { ArrowLeft, Send, Loader2, AlertCircle, Shield, Heart } from 'lucide-react'
+import { ArrowLeft, Send, Loader2, AlertCircle, Shield, Heart, Sparkles, Zap } from 'lucide-react'
 
 interface Character {
     id: string
@@ -93,6 +93,16 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
             }
         }
         return 1
+    }
+
+    const getBondStatus = (level: number) => {
+        const statuses = ['Stranger', 'Acquaintance', 'Friend', 'Close Friend', 'Deep Bond', 'Soulbound']
+        return statuses[Math.min(level, statuses.length - 1)]
+    }
+
+    const getBondColor = (level: number) => {
+        const colors = ['text-text-muted', 'text-accent-primary', 'text-accent-secondary', 'text-accent-warning', 'text-accent-success', 'text-accent-love']
+        return colors[Math.min(level, colors.length - 1)]
     }
 
     const scrollToBottom = () => {
@@ -202,34 +212,25 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                 currentLevel: data.currentLevel
             }
         } catch (error) {
-            console.error('Chat API Error:', error)
-            setError(error instanceof Error ? error.message : 'Failed to get AI response')
-
-            // Fallback response based on character personality
-            const characterProfile = (character as any).profile
-            if (characterProfile?.personality_traits?.communication_style) {
-                return { response: `I'm having some trouble connecting right now. Please try again.` }
-            }
-
-            return { response: "I'm having trouble connecting right now. Please try again." }
+            console.error('Error calling chat API:', error)
+            throw error
         }
     }
 
     const handleSendMessage = async () => {
-        if (!message.trim()) return
+        const currentMessage = message.trim()
+        if (!currentMessage || isTyping) return
 
         const userMessage: Message = {
             id: Date.now().toString(),
-            content: message.trim(),
+            content: currentMessage,
             sender: 'user',
             timestamp: new Date()
         }
 
         setMessages(prev => [...prev, userMessage])
-        const currentMessage = message.trim()
         setMessage('')
         setIsTyping(true)
-        setError(null)
 
         try {
             const result = await callChatAPI(currentMessage)
@@ -246,7 +247,7 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
 
                 const infoMessage: Message = {
                     id: (Date.now() + 2).toString(),
-                    content: `💕 *Your relationship needs to reach Level ${requiredLevel} to discuss that topic. Keep chatting to strengthen your bond! (Current: Level ${currentLevel})*`,
+                    content: `💕 *Your bond needs to reach Level ${requiredLevel} to discuss that topic. Keep chatting to strengthen your connection! (Current: Level ${currentLevel})*`,
                     sender: 'ai',
                     timestamp: new Date(Date.now() + 1000)
                 }
@@ -272,7 +273,7 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                 setMessages(prev => [...prev, aiResponse])
             }
 
-            // Update relationship data
+            // Update bond data with XP gain
             const newMemory = {
                 id: Date.now().toString(),
                 content: `Conversation: "${currentMessage.substring(0, 50)}${currentMessage.length > 50 ? '...' : ''}"`,
@@ -302,11 +303,6 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
         }
     }
 
-    const getCharacterColors = () => {
-        // Use primary color for all custom characters
-        return 'bg-primary-500 text-white'
-    }
-
     const retryLastMessage = () => {
         if (messages.length >= 2) {
             const lastUserMessage = messages[messages.length - 2]
@@ -319,60 +315,72 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
         }
     }
 
+    const currentLevel = getCurrentLevelFromXP(relationshipData.experience)
+    const bondStatus = getBondStatus(currentLevel)
+    const bondColor = getBondColor(currentLevel)
+
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen yapchat-container flex flex-col">
             {/* Header */}
-            <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+            <div className="yapchat-glass-header border-b border-border-glass px-6 py-4">
                 <div className="max-w-4xl mx-auto flex items-center gap-4">
                     <button
                         onClick={onBack}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="yapchat-btn-glass p-2 rounded-xl"
                     >
                         <ArrowLeft className="w-5 h-5" />
                     </button>
-                    <div className="flex items-center gap-3">
-                        <div className="text-3xl">{character.icon}</div>
+                    <div className="flex items-center gap-4">
+                        <div className="yapchat-glass-character w-12 h-12 rounded-2xl flex items-center justify-center text-2xl yapchat-glow">
+                            {character.icon}
+                        </div>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-900">{character.name}</h1>
-                            <p className="text-sm text-gray-600">{character.type}</p>
+                            <h1 className="text-xl font-bold font-display text-text-primary">{character.name}</h1>
+                            <p className="text-sm text-text-muted font-body">{character.type}</p>
                         </div>
                     </div>
                     <div className="ml-auto flex items-center gap-4">
                         {error && (
-                            <div className="flex items-center gap-2 text-amber-600 text-sm">
-                                <AlertCircle className="w-4 h-4" />
-                                <span>Connection issue</span>
+                            <div className="yapchat-glass-warning rounded-xl px-3 py-2 flex items-center gap-2">
+                                <AlertCircle className="w-4 h-4 text-accent-warning" />
+                                <span className="text-sm text-text-primary font-body">Connection issue</span>
                                 <button
                                     onClick={retryLastMessage}
-                                    className="text-blue-600 hover:text-blue-800 underline"
+                                    className="text-accent-primary hover:text-accent-secondary underline text-sm font-body"
                                 >
                                     Retry
                                 </button>
                             </div>
                         )}
-                        <div className="text-sm text-gray-500">
-                            Level {getCurrentLevelFromXP(relationshipData.experience)} • {relationshipData.experience} XP
+                        <div className="yapchat-glass-subtle rounded-xl px-4 py-2">
+                            <div className="flex items-center gap-2">
+                                <Sparkles className={`w-4 h-4 ${bondColor} yapchat-glow`} />
+                                <div className="text-sm font-body">
+                                    <div className={`font-medium ${bondColor}`}>{bondStatus}</div>
+                                    <div className="text-text-muted">Level {currentLevel} • {relationshipData.experience} XP</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-6 py-4 bg-gray-50">
-                <div className="max-w-4xl mx-auto space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+                <div className="max-w-4xl mx-auto space-y-6">
                     {messages.map((msg) => (
                         <div
                             key={msg.id}
                             className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
                             <div
-                                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${msg.sender === 'user'
-                                    ? 'bg-blue-600 text-white'
-                                    : `${getCharacterColors()} ${msg.fallback ? 'opacity-75' : ''}`
+                                className={`max-w-xs lg:max-w-md rounded-2xl px-4 py-3 ${msg.sender === 'user'
+                                        ? 'yapchat-glass-user yapchat-glow'
+                                        : `yapchat-glass-character yapchat-glow-character ${msg.fallback ? 'opacity-75' : ''}`
                                     }`}
                             >
-                                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                                <p className="text-xs opacity-70 mt-1 flex items-center gap-1">
+                                <p className="text-sm whitespace-pre-wrap font-body text-text-primary">{msg.content}</p>
+                                <p className="text-xs text-text-muted mt-2 flex items-center gap-1 font-body">
                                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     {msg.fallback && <span title="Fallback response">⚠️</span>}
                                 </p>
@@ -382,10 +390,10 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
 
                     {isTyping && (
                         <div className="flex justify-start">
-                            <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${getCharacterColors()}`}>
+                            <div className="max-w-xs lg:max-w-md yapchat-glass-character rounded-2xl px-4 py-3 yapchat-glow-character">
                                 <div className="flex items-center gap-2">
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span className="text-sm">{character.name} is thinking...</span>
+                                    <Loader2 className="w-4 h-4 animate-spin text-accent-primary yapchat-glow" />
+                                    <span className="text-sm font-body text-text-primary">{character.name} is thinking...</span>
                                 </div>
                             </div>
                         </div>
@@ -396,16 +404,16 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
             </div>
 
             {/* Input */}
-            <div className="border-t border-gray-200 px-6 py-4 bg-white">
+            <div className="yapchat-glass-header border-t border-border-glass px-6 py-4">
                 <div className="max-w-4xl mx-auto">
                     {error && (
-                        <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                        <div className="mb-4 yapchat-glass-warning rounded-2xl p-4">
                             <div className="flex items-center gap-2">
-                                <AlertCircle className="w-4 h-4" />
-                                <span>{error}</span>
+                                <AlertCircle className="w-4 h-4 text-accent-warning" />
+                                <span className="text-sm font-body text-text-primary">{error}</span>
                             </div>
-                            <p className="mt-1 text-xs">
-                                Make sure your Anthropic API key is configured in environment variables.
+                            <p className="mt-1 text-xs text-text-muted font-body">
+                                Make sure your API connection is stable and try again.
                             </p>
                         </div>
                     )}
@@ -416,13 +424,13 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                             onChange={(e) => setMessage(e.target.value)}
                             onKeyPress={handleKeyPress}
                             placeholder={`Message ${character.name}...`}
-                            className="flex-1 rounded-xl border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            className="yapchat-input-chat flex-1 rounded-2xl px-4 py-3 font-body"
                             disabled={isTyping}
                         />
                         <button
                             onClick={handleSendMessage}
                             disabled={!message.trim() || isTyping}
-                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-colors"
+                            className="yapchat-btn-character p-3 rounded-2xl"
                         >
                             <Send className="w-5 h-5" />
                         </button>

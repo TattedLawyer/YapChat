@@ -475,44 +475,46 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
     // Intro Phase
     if (phase === 'intro') {
         return (
-            <div className="min-h-screen flex items-center justify-center px-6">
+            <div className="min-h-screen yapchat-container flex items-center justify-center px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="glass-card rounded-3xl p-8 max-w-2xl mx-auto text-center"
+                    className="yapchat-glass rounded-4xl p-8 max-w-2xl mx-auto text-center yapchat-glow-character"
                 >
                     <div className="flex justify-center mb-6">
-                        <div className="p-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full">
-                            <MessageCircle className="h-12 w-12 text-white" />
+                        <div className="yapchat-glass-character p-4 rounded-3xl yapchat-glow-character-intense">
+                            <MessageCircle className="h-12 w-12 text-accent-primary" />
                         </div>
                     </div>
 
-                    <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                        ✨ Let&apos;s Find Your Perfect Companion
+                    <h1 className="text-4xl font-bold font-display text-text-primary mb-4">
+                        <span className="text-transparent bg-clip-text bg-gradient-primary">
+                            ✨ Let&apos;s Find Your Perfect Companion
+                        </span>
                     </h1>
 
-                    <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                    <p className="text-lg text-text-secondary mb-8 leading-relaxed font-body">
                         🌟 I&apos;m excited to help you find your perfect anime/fantasy companion! I just have a few questions
                         about your personality and what draws you to characters. This feels more like a friendly chat than a test.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="p-4 bg-blue-50 rounded-xl">
-                            <User className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                            <h3 className="font-semibold text-gray-900 mb-1">✨ Your Personality</h3>
-                            <p className="text-sm text-gray-600">Your unique traits & energy</p>
+                        <div className="yapchat-glass-subtle rounded-2xl p-4 yapchat-glow">
+                            <User className="h-8 w-8 text-accent-primary mx-auto mb-2 yapchat-glow" />
+                            <h3 className="font-semibold font-display text-text-primary mb-1">✨ Your Personality</h3>
+                            <p className="text-sm text-text-muted font-body">Your unique traits & energy</p>
                         </div>
 
-                        <div className="p-4 bg-purple-50 rounded-xl">
-                            <Heart className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                            <h3 className="font-semibold text-gray-900 mb-1">🌟 Your Inspiration</h3>
-                            <p className="text-sm text-gray-600">Anime/fantasy characters you love</p>
+                        <div className="yapchat-glass-subtle rounded-2xl p-4 yapchat-glow">
+                            <Heart className="h-8 w-8 text-accent-love mx-auto mb-2 yapchat-glow" />
+                            <h3 className="font-semibold font-display text-text-primary mb-1">🌟 Your Inspiration</h3>
+                            <p className="text-sm text-text-muted font-body">Anime/fantasy characters you love</p>
                         </div>
 
-                        <div className="p-4 bg-pink-50 rounded-xl">
-                            <Star className="h-8 w-8 text-pink-600 mx-auto mb-2" />
-                            <h3 className="font-semibold text-gray-900 mb-1">💕 Perfect Match</h3>
-                            <p className="text-sm text-gray-600">Your ideal companion connection</p>
+                        <div className="yapchat-glass-subtle rounded-2xl p-4 yapchat-glow">
+                            <Star className="h-8 w-8 text-accent-warning mx-auto mb-2 yapchat-glow" />
+                            <h3 className="font-semibold font-display text-text-primary mb-1">💕 Perfect Match</h3>
+                            <p className="text-sm text-text-muted font-body">Your ideal companion connection</p>
                         </div>
                     </div>
 
@@ -520,7 +522,7 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                         {onBack && (
                             <button
                                 onClick={onBack}
-                                className="px-6 py-3 text-gray-600 hover:text-gray-800 transition-colors"
+                                className="yapchat-btn-glass px-6 py-3 rounded-xl font-body"
                             >
                                 ← Back
                             </button>
@@ -528,7 +530,7 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
 
                         <button
                             onClick={() => setPhase('questions')}
-                            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                            className="yapchat-btn-character px-8 py-3 rounded-xl font-semibold font-body"
                         >
                             Ready to Start! 🚀
                         </button>
@@ -541,17 +543,17 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
     // Completing Phase
     if (phase === 'completing') {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen yapchat-container flex items-center justify-center">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="glass-card rounded-2xl p-12 text-center max-w-md mx-auto"
+                    className="yapchat-glass rounded-3xl p-12 text-center max-w-md mx-auto yapchat-glow-character"
                 >
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-6"></div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-accent-primary mx-auto mb-6 yapchat-glow"></div>
+                    <h3 className="text-xl font-semibold font-display text-text-primary mb-2">
                         ✨ Finding Your Perfect Companion Match
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-text-muted font-body">
                         🔮 Analyzing your personality and preferences to find your ideal companion...
                     </p>
                 </motion.div>
@@ -561,22 +563,22 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
 
     // Questions Phase
     return (
-        <div className="min-h-screen py-8 px-6">
+        <div className="min-h-screen yapchat-container py-8 px-6">
             <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <div className="flex items-center justify-center gap-2 mb-4">
-                        <span className="text-sm font-medium text-purple-600">
+                        <span className="text-sm font-medium text-accent-primary font-body">
                             Question {currentQuestionIndex + 1} of {conversationalQuestions.length}
                         </span>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-text-muted font-body">
                             • {currentQuestion.category}
                         </span>
                     </div>
 
-                    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                    <div className="w-full bg-background-secondary rounded-full h-3 mb-4 overflow-hidden">
                         <motion.div
-                            className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full"
+                            className="bg-gradient-primary h-3 rounded-full yapchat-glow"
                             initial={{ width: 0 }}
                             animate={{ width: `${progress}%` }}
                             transition={{ duration: 0.5 }}
@@ -592,20 +594,20 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.3 }}
-                        className="glass-card rounded-2xl p-8 mb-8"
+                        className="yapchat-glass rounded-3xl p-8 mb-8 yapchat-glow"
                     >
                         <div className="text-center mb-8">
                             {currentQuestion.type === 'multiselect' && (
-                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 rounded-full text-purple-700 text-sm font-medium mb-4">
+                                <div className="yapchat-badge-notification inline-flex items-center gap-2 px-3 py-1 text-sm font-medium mb-4 font-body">
                                     <CheckCircle className="h-4 w-4" />
                                     Multiple selections allowed
                                 </div>
                             )}
-                            <h2 className="text-2xl font-semibold text-gray-900 leading-relaxed mb-3">
+                            <h2 className="text-2xl font-semibold font-display text-text-primary leading-relaxed mb-3">
                                 {currentQuestion.question}
                             </h2>
                             {currentQuestion.subtitle && (
-                                <p className="text-gray-600 text-lg">
+                                <p className="text-text-secondary text-lg font-body">
                                     {currentQuestion.subtitle}
                                 </p>
                             )}
@@ -619,9 +621,9 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                                         <button
                                             key={option.value}
                                             onClick={() => handleAnswer(currentQuestion.id, option.value)}
-                                            className={`w-full p-4 rounded-xl border-2 transition-all duration-200 text-left ${answers[currentQuestion.id] === option.value
-                                                ? 'border-purple-500 bg-purple-50 text-purple-900'
-                                                : 'border-gray-200 hover:border-purple-300 hover:bg-purple-25'
+                                            className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 text-left yapchat-glow ${answers[currentQuestion.id] === option.value
+                                                    ? 'border-accent-primary yapchat-glass-accent text-text-primary'
+                                                    : 'border-border-glass yapchat-glass-subtle hover:border-accent-primary'
                                                 }`}
                                         >
                                             <div className="flex items-center justify-between">
@@ -629,10 +631,10 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                                                     {option.emoji && (
                                                         <span className="text-2xl">{option.emoji}</span>
                                                     )}
-                                                    <span className="font-medium">{option.label}</span>
+                                                    <span className="font-medium font-body">{option.label}</span>
                                                 </div>
                                                 {answers[currentQuestion.id] === option.value && (
-                                                    <CheckCircle className="h-5 w-5 text-purple-600" />
+                                                    <CheckCircle className="h-5 w-5 text-accent-primary yapchat-glow" />
                                                 )}
                                             </div>
                                         </button>
@@ -657,9 +659,9 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                                                     }
                                                     handleAnswer(currentQuestion.id, newValues)
                                                 }}
-                                                className={`w-full p-4 rounded-xl border-2 transition-all duration-200 text-left ${isSelected
-                                                    ? 'border-purple-500 bg-purple-50 text-purple-900'
-                                                    : 'border-gray-200 hover:border-purple-300 hover:bg-purple-25'
+                                                className={`w-full p-4 rounded-2xl border-2 transition-all duration-300 text-left yapchat-glow ${isSelected
+                                                        ? 'border-accent-primary yapchat-glass-accent text-text-primary'
+                                                        : 'border-border-glass yapchat-glass-subtle hover:border-accent-primary'
                                                     }`}
                                             >
                                                 <div className="flex items-center justify-between">
@@ -667,10 +669,10 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                                                         {option.emoji && (
                                                             <span className="text-2xl">{option.emoji}</span>
                                                         )}
-                                                        <span className="font-medium">{option.label}</span>
+                                                        <span className="font-medium font-body">{option.label}</span>
                                                     </div>
                                                     {isSelected && (
-                                                        <CheckCircle className="h-5 w-5 text-purple-600" />
+                                                        <CheckCircle className="h-5 w-5 text-accent-primary yapchat-glow" />
                                                     )}
                                                 </div>
                                             </button>
@@ -683,7 +685,7 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                                     placeholder={currentQuestion.placeholder}
                                     value={answers[currentQuestion.id] || ''}
                                     onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
-                                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none text-lg"
+                                    className="yapchat-input-dashboard w-full p-4 rounded-2xl text-lg font-body"
                                 />
                             ) : (
                                 <textarea
@@ -691,7 +693,7 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                                     value={answers[currentQuestion.id] || ''}
                                     onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
                                     rows={4}
-                                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none text-lg resize-none"
+                                    className="yapchat-input-dashboard w-full p-4 rounded-2xl text-lg resize-none font-body"
                                 />
                             )}
                         </div>
@@ -703,7 +705,7 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                     <button
                         onClick={prevQuestion}
                         disabled={currentQuestionIndex === 0}
-                        className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="yapchat-btn-glass flex items-center gap-2 px-6 py-3 rounded-xl font-body disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <ChevronLeft className="h-4 w-4" />
                         Previous
@@ -712,7 +714,7 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                     <button
                         onClick={nextQuestion}
                         disabled={!isCurrentAnswered()}
-                        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                        className="yapchat-btn-character flex items-center gap-2 px-6 py-3 rounded-xl font-semibold font-body disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {currentQuestionIndex === conversationalQuestions.length - 1 ? (
                             <>Create My Companion! ✨</>

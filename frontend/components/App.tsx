@@ -6,9 +6,10 @@ import PersonalityTest from './PersonalityTest'
 import ChatInterface from './ChatInterface'
 import MessagingDashboard from './MessagingDashboard'
 import AccountPrompt from './AccountPrompt'
+import CharacterNaming from './CharacterNaming'
 
 
-type View = 'home' | 'personality-test' | 'dashboard' | 'chat'
+type View = 'home' | 'personality-test' | 'dashboard' | 'chat' | 'naming'
 type UserTier = 'free' | 'premium' | 'ultimate'
 
 interface CharacterProfile {
@@ -105,6 +106,10 @@ export default function App() {
     const [user, setUser] = useState<User | null>(null)
     const [isCreatingCharacter, setIsCreatingCharacter] = useState(false)
     const [showAccountPrompt, setShowAccountPrompt] = useState(false)
+    const [pendingCharacter, setPendingCharacter] = useState<{
+        profile: CharacterProfile
+        description: string
+    } | null>(null)
 
     const [relationshipData, setRelationshipData] = useState<RelationshipData>({
         level: 1,
@@ -130,10 +135,24 @@ export default function App() {
 
 
 
-    const handlePersonalityComplete = (results: PersonalityResults) => {
+    const handlePersonalityComplete = async (results: PersonalityResults) => {
         setPersonalityResults(results)
-        // Direct to dashboard instead of home page (no intermediate screens)
-        setCurrentView('dashboard')
+
+        // Check if user specified a favorite character - if so, auto-create companion
+        if (results.preferences.favorite_character && results.preferences.character_source) {
+            let characterDescription = `${results.preferences.favorite_character} from ${results.preferences.character_source}`
+
+            // Add additional context if available
+            if (results.preferences.what_attracts_character) {
+                characterDescription += ` - ${results.preferences.what_attracts_character}`
+            }
+
+            console.log('🔧 Auto-creating character from personality test:', characterDescription)
+            await handleCreateCustomCharacter(characterDescription)
+        } else {
+            // If no favorite character specified, go to dashboard to create manually
+            setCurrentView('dashboard')
+        }
     }
 
     // RPG-style level calculation helper
@@ -293,44 +312,15 @@ export default function App() {
 
             const { characterProfile } = result
 
-            // Create character object
-            const character: Character = {
-                id: `custom_${Date.now()}`,
-                name: characterProfile.character_name,
-                type: characterProfile.fictional_lore,
-                description: characterDescription,
+            // Store character for naming step
+            setPendingCharacter({
                 profile: characterProfile,
-                icon: getCharacterIcon(characterProfile),
-                color: 'text-primary-600',
-                bgGradient: 'from-primary-50 to-primary-100'
-            }
+                description: characterDescription
+            })
 
-            // Create companion chat
-            const newCompanion: CompanionChat = {
-                id: character.id,
-                name: character.name,
-                series: character.type,
-                avatar: character.icon,
-                lastMessage: "Hi there! I'm excited to chat with you!",
-                lastMessageTime: 'Just now',
-                relationshipLevel: 1,
-                relationshipScore: 0,
-                maxScore: 100,
-                unreadCount: 1,
-                isOnline: true,
-                character: character,
-                messageCount: 0
-            }
-
-            // Add to user's companion chats
-            setUser(prev => prev ? {
-                ...prev,
-                companionChats: [...prev.companionChats, newCompanion]
-            } : null)
-
-            console.log('🔧 Character created successfully, going to dashboard')
-            // Go directly to dashboard
-            setCurrentView('dashboard')
+            console.log('🔧 Character created successfully, going to naming screen')
+            // Go to naming screen instead of dashboard
+            setCurrentView('naming')
         } catch (error) {
             console.error('🔧 Character creation error:', error)
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
@@ -448,6 +438,56 @@ export default function App() {
         setSelectedCompanion(null)
     }
 
+    const handleNameConfirmed = (customName: string) => {
+        if (!pendingCharacter || !user) return
+
+        const { profile, description } = pendingCharacter
+
+        // Create character object with user-chosen name
+        const character: Character = {
+            id: `custom_${Date.now()}`,
+            name: customName,
+            type: profile.fictional_lore,
+            description: description,
+            profile: profile,
+            icon: getCharacterIcon(profile),
+            color: 'text-primary-600',
+            bgGradient: 'from-primary-50 to-primary-100'
+        }
+
+        // Create companion chat
+        const newCompanion: CompanionChat = {
+            id: character.id,
+            name: character.name,
+            series: character.type,
+            avatar: character.icon,
+            lastMessage: "Hi there! I'm excited to chat with you!",
+            lastMessageTime: 'Just now',
+            relationshipLevel: 1,
+            relationshipScore: 0,
+            maxScore: 100,
+            unreadCount: 1,
+            isOnline: true,
+            character: character,
+            messageCount: 0
+        }
+
+        // Add to user's companion chats
+        setUser(prev => prev ? {
+            ...prev,
+            companionChats: [...prev.companionChats, newCompanion]
+        } : null)
+
+        // Clear pending character and go to dashboard
+        setPendingCharacter(null)
+        setCurrentView('dashboard')
+    }
+
+    const handleBackFromNaming = () => {
+        setPendingCharacter(null)
+        setCurrentView('home')
+    }
+
     const handleUpdateRelationship = (newData: RelationshipData) => {
         setRelationshipData(newData)
 
@@ -513,6 +553,15 @@ export default function App() {
                         personalityResults={personalityResults || undefined}
                     />
                 ) : null
+            case 'naming':
+                return pendingCharacter ? (
+                    <CharacterNaming
+                        characterProfile={pendingCharacter.profile}
+                        originalDescription={pendingCharacter.description}
+                        onNameConfirmed={handleNameConfirmed}
+                        onBack={handleBackFromNaming}
+                    />
+                ) : null
             default:
                 return (
                     <HomePage
@@ -526,7 +575,7 @@ export default function App() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
             {renderCurrentView()}
 
             {/* Account Prompt Modal */}

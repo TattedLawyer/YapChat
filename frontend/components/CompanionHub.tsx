@@ -10,7 +10,8 @@ import {
     BookOpen,
     ArrowLeft,
     Sparkles,
-    Gift
+    Gift,
+    Zap
 } from 'lucide-react'
 
 interface Character {
@@ -50,19 +51,6 @@ const getTimeBasedGreeting = () => {
     return "Good evening"
 }
 
-const getTimeBasedBackground = () => {
-    const hour = new Date().getHours()
-
-    // Use time-based gradients for all characters
-    if (hour < 12) {
-        return 'from-blue-100 via-indigo-50 to-purple-100'
-    } else if (hour < 17) {
-        return 'from-purple-50 via-pink-100 to-rose-200'
-    } else {
-        return 'from-indigo-100 via-purple-100 to-pink-200'
-    }
-}
-
 const getCharacterMood = (character: any, relationshipLevel: number) => {
     // Use character's voice or generate based on personality
     const profile = character.profile
@@ -70,7 +58,7 @@ const getCharacterMood = (character: any, relationshipLevel: number) => {
         return profile.character_voice
     }
 
-    // Generate mood based on relationship level
+    // Generate mood based on bond level
     const levelMoods = [
         "Nice to meet you! I'm looking forward to getting to know you better.",
         "I'm really enjoying our conversations together!",
@@ -78,6 +66,16 @@ const getCharacterMood = (character: any, relationshipLevel: number) => {
     ]
 
     return levelMoods[Math.min(relationshipLevel - 1, levelMoods.length - 1)] || levelMoods[0]
+}
+
+const getBondStatus = (level: number) => {
+    const statuses = ['Stranger', 'Acquaintance', 'Friend', 'Close Friend', 'Deep Bond', 'Soulbound']
+    return statuses[Math.min(level, statuses.length - 1)]
+}
+
+const getBondColor = (level: number) => {
+    const colors = ['text-text-muted', 'text-accent-primary', 'text-accent-secondary', 'text-accent-warning', 'text-accent-success', 'text-accent-love']
+    return colors[Math.min(level, colors.length - 1)]
 }
 
 export default function CompanionHub({
@@ -93,7 +91,6 @@ export default function CompanionHub({
         setCharacterMood(getCharacterMood(character, relationshipData.level))
     }, [character, relationshipData.level])
 
-    const timeBasedBg = getTimeBasedBackground()
     const greeting = getTimeBasedGreeting()
 
     // RPG-style level progression
@@ -134,20 +131,23 @@ export default function CompanionHub({
     const xpNeededForLevel = nextLevelXP - currentLevelXP
     const progressPercentage = actualLevel >= 20 ? 100 : (progressInLevel / xpNeededForLevel) * 100
 
+    const bondStatus = getBondStatus(actualLevel)
+    const bondColor = getBondColor(actualLevel)
+
     const quickActions = [
         {
             icon: MessageCircle,
-            label: 'Chat',
+            label: 'Start Chat',
             action: onStartChat,
-            color: 'bg-blue-500 hover:bg-blue-600',
-            description: 'Start a conversation'
+            color: 'yapchat-btn-character',
+            description: 'Continue your conversation'
         },
         {
             icon: BookOpen,
             label: 'Memories',
             action: () => setShowMemories(true),
-            color: 'bg-purple-500 hover:bg-purple-600',
-            description: 'View shared memories'
+            color: 'yapchat-btn-glass',
+            description: 'View shared moments'
         },
         {
             icon: Gift,
@@ -155,31 +155,33 @@ export default function CompanionHub({
             action: () => {
                 alert('Activities feature coming soon! More interactive experiences will be added in future updates.')
             },
-            color: 'bg-green-500 hover:bg-green-600',
+            color: 'yapchat-btn-glass',
             description: 'Fun activities together',
             disabled: !relationshipData.unlockedContent.includes('activities')
         }
     ]
 
     return (
-        <div className={`min-h-screen bg-gradient-to-br ${timeBasedBg}`}>
+        <div className="min-h-screen yapchat-container">
             {/* Header */}
-            <div className="px-6 py-4 flex items-center justify-between">
-                <button
-                    onClick={onBack}
-                    className="p-2 hover:bg-white/20 rounded-lg transition-colors flex items-center gap-2 text-gray-700"
-                >
-                    <ArrowLeft className="w-5 h-5" />
-                    <span className="hidden sm:inline">Back</span>
-                </button>
+            <div className="yapchat-glass-header border-b border-border-glass px-6 py-4">
+                <div className="flex items-center justify-between">
+                    <button
+                        onClick={onBack}
+                        className="yapchat-btn-glass p-2 rounded-xl flex items-center gap-2"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                        <span className="hidden sm:inline font-body">Back to Hub</span>
+                    </button>
 
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Calendar className="w-4 h-4" />
-                    <span>Day {relationshipData.daysTogether}</span>
+                    <div className="flex items-center gap-2 text-sm text-text-muted font-body">
+                        <Calendar className="w-4 h-4" />
+                        <span>Day {relationshipData.daysTogether}</span>
+                    </div>
                 </div>
             </div>
 
-            <div className="max-w-4xl mx-auto px-6 pb-8">
+            <div className="max-w-4xl mx-auto px-6 py-8">
                 {/* Character Display */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -188,11 +190,11 @@ export default function CompanionHub({
                 >
                     {/* Large Character Avatar */}
                     <motion.div
-                        className="text-8xl mb-4 cursor-pointer"
+                        className="yapchat-glass-character w-32 h-32 rounded-3xl flex items-center justify-center text-6xl mb-6 mx-auto cursor-pointer yapchat-glow-character-intense"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                         animate={{
-                            y: [0, -10, 0],
+                            y: [0, -5, 0],
                         }}
                         transition={{
                             duration: 3,
@@ -203,12 +205,14 @@ export default function CompanionHub({
                         {character.icon}
                     </motion.div>
 
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                        {greeting}, it&apos;s {character.name}!
+                    <h1 className="text-4xl font-bold font-display text-text-primary mb-3">
+                        <span className="text-transparent bg-clip-text bg-gradient-primary">
+                            {greeting}, it&apos;s {character.name}!
+                        </span>
                     </h1>
 
                     <motion.p
-                        className="text-lg text-gray-700 mb-6 max-w-md mx-auto"
+                        className="text-lg text-text-secondary mb-6 max-w-md mx-auto font-body"
                         key={characterMood}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -218,39 +222,52 @@ export default function CompanionHub({
                     </motion.p>
                 </motion.div>
 
-                {/* Relationship Status */}
+                {/* Bond Status */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="glass-card rounded-2xl p-6 mb-8"
+                    className="yapchat-glass rounded-3xl p-6 mb-8 yapchat-glow"
                 >
                     <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                            <Heart className="w-5 h-5 text-red-500" />
-                            <span className="font-semibold text-gray-900">
-                                Relationship Level {actualLevel}
-                            </span>
+                        <div className="flex items-center gap-3">
+                            <Heart className={`w-6 h-6 ${bondColor} yapchat-glow`} />
+                            <div>
+                                <span className="font-semibold font-display text-text-primary text-lg">
+                                    Bond Level {actualLevel}
+                                </span>
+                                <div className={`text-sm font-body ${bondColor}`}>
+                                    {bondStatus}
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
-                            <Star className="w-4 h-4 text-yellow-500" />
+                        <div className="flex items-center gap-2 text-sm text-text-muted font-body">
+                            <Sparkles className="w-4 h-4 text-accent-primary" />
                             <span>{relationshipData.experience} XP</span>
                         </div>
                     </div>
 
-                    <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                    <div className="w-full bg-background-secondary rounded-full h-4 mb-3 overflow-hidden">
                         <motion.div
-                            className="bg-gradient-to-r from-pink-500 to-purple-600 h-3 rounded-full"
+                            className="bg-gradient-primary h-4 rounded-full yapchat-glow"
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(progressPercentage, 100)}%` }}
                             transition={{ duration: 1, delay: 0.5 }}
                         />
                     </div>
 
-                    <div className="flex justify-between text-sm text-gray-600">
+                    <div className="flex justify-between text-sm text-text-muted font-body">
                         <span>{relationshipData.experience} / {nextLevelXP} to next level</span>
                         <span>{Math.round(progressPercentage)}%</span>
                     </div>
+
+                    {actualLevel >= 20 && (
+                        <div className="mt-3 text-center">
+                            <span className="yapchat-badge-premium font-body">
+                                Maximum Bond Level Reached!
+                            </span>
+                        </div>
+                    )}
                 </motion.div>
 
                 {/* Quick Actions */}
@@ -258,26 +275,26 @@ export default function CompanionHub({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8"
+                    className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8"
                 >
                     {quickActions.map((action) => (
                         <motion.button
                             key={action.label}
                             onClick={action.action}
                             disabled={action.disabled}
-                            className={`glass-card rounded-xl p-6 text-center transition-all duration-200 hover:scale-105 ${action.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-lg cursor-pointer'
+                            className={`yapchat-glass rounded-3xl p-6 text-center transition-all duration-300 yapchat-glow ${action.disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 cursor-pointer yapchat-glow-character'
                                 }`}
-                            whileHover={action.disabled ? {} : { y: -2 }}
+                            whileHover={action.disabled ? {} : { y: -4 }}
                             whileTap={action.disabled ? {} : { scale: 0.98 }}
                         >
-                            <div className={`w-12 h-12 rounded-full ${action.color} flex items-center justify-center mx-auto mb-3 transition-colors`}>
-                                <action.icon className="w-6 h-6 text-white" />
+                            <div className={`w-12 h-12 rounded-2xl ${action.color} flex items-center justify-center mx-auto mb-4 yapchat-glow`}>
+                                <action.icon className="w-6 h-6" />
                             </div>
-                            <h3 className="font-semibold text-gray-900 mb-1">{action.label}</h3>
-                            <p className="text-sm text-gray-600">{action.description}</p>
+                            <h3 className="font-semibold font-display text-text-primary mb-2">{action.label}</h3>
+                            <p className="text-sm text-text-muted font-body">{action.description}</p>
                             {action.disabled && (
-                                <div className="mt-2">
-                                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                                <div className="mt-3">
+                                    <span className="yapchat-badge-notification text-xs font-body">
                                         Unlock at Level 2
                                     </span>
                                 </div>
@@ -292,21 +309,25 @@ export default function CompanionHub({
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.6 }}
-                        className="glass-card rounded-2xl p-6"
+                        className="yapchat-glass rounded-3xl p-6 yapchat-glow"
                     >
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-purple-500" />
+                        <h3 className="text-xl font-semibold font-display text-text-primary mb-6 flex items-center gap-3">
+                            <Sparkles className="w-6 h-6 text-accent-primary yapchat-glow" />
                             Recent Memories
                         </h3>
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             {relationshipData.memories.slice(-3).map((memory) => (
-                                <div key={memory.id} className="flex items-start gap-3 p-3 bg-white/50 rounded-lg">
-                                    <div className="text-2xl">{character.icon}</div>
-                                    <div className="flex-1">
-                                        <p className="text-sm text-gray-700">{memory.content}</p>
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            {memory.timestamp.toLocaleDateString()}
-                                        </p>
+                                <div key={memory.id} className="yapchat-glass-subtle rounded-2xl p-4 yapchat-glow">
+                                    <div className="flex items-start gap-4">
+                                        <div className="yapchat-glass-character w-10 h-10 rounded-xl flex items-center justify-center text-lg yapchat-glow">
+                                            {character.icon}
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-sm text-text-primary font-body">{memory.content}</p>
+                                            <p className="text-xs text-text-muted mt-2 font-body">
+                                                {memory.timestamp.toLocaleDateString()}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -320,43 +341,45 @@ export default function CompanionHub({
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+                    className="fixed inset-0 bg-background-overlay flex items-center justify-center p-4 z-50"
                     onClick={() => setShowMemories(false)}
                 >
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="glass-card rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+                        className="yapchat-glass-intense rounded-3xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto yapchat-glow-character-intense"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-900">Shared Memories</h2>
+                            <h2 className="text-2xl font-bold font-display text-text-primary">Shared Memories</h2>
                             <button
                                 onClick={() => setShowMemories(false)}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                className="yapchat-btn-glass p-2 rounded-xl"
                             >
                                 ✕
                             </button>
                         </div>
 
                         {relationshipData.memories.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">
-                                <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                                <p>No memories yet. Start chatting to create some!</p>
+                            <div className="text-center py-12 text-text-muted">
+                                <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                                <p className="font-body text-lg">No memories yet. Start chatting to create some!</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
                                 {relationshipData.memories.map((memory) => (
-                                    <div key={memory.id} className="p-4 bg-white/30 rounded-lg">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className="text-lg">{character.icon}</span>
-                                            <span className="text-sm font-medium text-gray-900">
+                                    <div key={memory.id} className="yapchat-glass-subtle rounded-2xl p-4">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <div className="yapchat-glass-character w-8 h-8 rounded-xl flex items-center justify-center text-sm yapchat-glow">
+                                                {character.icon}
+                                            </div>
+                                            <span className="text-sm font-medium font-body text-text-primary">
                                                 {memory.type === 'conversation' ? 'Conversation' :
                                                     memory.type === 'milestone' ? 'Milestone' : 'Activity'}
                                             </span>
                                         </div>
-                                        <p className="text-gray-700 mb-2">{memory.content}</p>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-text-secondary mb-3 font-body">{memory.content}</p>
+                                        <p className="text-xs text-text-muted font-body">
                                             {memory.timestamp.toLocaleString()}
                                         </p>
                                     </div>
