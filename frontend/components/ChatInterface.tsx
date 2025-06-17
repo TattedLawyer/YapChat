@@ -77,19 +77,33 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                         body: JSON.stringify({
                             message: "Hi",
                             characterProfile: (character as any).profile,
-                            isFirstMessage: true
+                            isFirstMessage: true,
+                            userPersonality: personalityResults
                         }),
                     })
 
                     if (response.ok) {
                         const data = await response.json()
-                        const greeting: Message = {
-                            id: '1',
-                            content: data.response,
-                            sender: 'ai',
-                            timestamp: new Date()
+
+                        if (data.isMultiMessage && Array.isArray(data.response)) {
+                            // Handle multiple messages
+                            const greetingMessages: Message[] = data.response.map((msg: string, index: number) => ({
+                                id: `greeting_${index + 1}`,
+                                content: msg,
+                                sender: 'ai' as const,
+                                timestamp: new Date(Date.now() + index * 1000) // Slight delay between messages
+                            }))
+                            setMessages(greetingMessages)
+                        } else {
+                            // Single message
+                            const greeting: Message = {
+                                id: '1',
+                                content: typeof data.response === 'string' ? data.response : data.response[0],
+                                sender: 'ai',
+                                timestamp: new Date()
+                            }
+                            setMessages([greeting])
                         }
-                        setMessages([greeting])
                     }
                 } catch (error) {
                     console.error('Error getting initial greeting:', error)
@@ -110,7 +124,7 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
         }
     }, [character.id, messages.length])
 
-    const callChatAPI = async (userMessage: string): Promise<string> => {
+    const callChatAPI = async (userMessage: string): Promise<string | string[]> => {
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
@@ -121,7 +135,8 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                     message: userMessage,
                     characterProfile: (character as any).profile,
                     conversationHistory: messages.slice(-10), // Send last 10 messages for context
-                    isFirstMessage: false
+                    isFirstMessage: false,
+                    userPersonality: personalityResults
                 }),
             })
 
@@ -172,14 +187,25 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
         try {
             const aiResponseText = await callChatAPI(currentMessage)
 
-            const aiResponse: Message = {
-                id: (Date.now() + 1).toString(),
-                content: aiResponseText,
-                sender: 'ai',
-                timestamp: new Date()
+            if (Array.isArray(aiResponseText)) {
+                // Handle multiple messages
+                const aiResponses: Message[] = aiResponseText.map((msg, index) => ({
+                    id: `${Date.now() + index + 1}`,
+                    content: msg,
+                    sender: 'ai' as const,
+                    timestamp: new Date(Date.now() + index * 1000)
+                }))
+                setMessages(prev => [...prev, ...aiResponses])
+            } else {
+                // Handle single message
+                const aiResponse: Message = {
+                    id: (Date.now() + 1).toString(),
+                    content: aiResponseText,
+                    sender: 'ai',
+                    timestamp: new Date()
+                }
+                setMessages(prev => [...prev, aiResponse])
             }
-
-            setMessages(prev => [...prev, aiResponse])
 
             // Update relationship data
             const newMemory = {

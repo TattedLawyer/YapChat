@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import HomePage from './HomePage'
 import PersonalityTest from './PersonalityTest'
 import ChatInterface from './ChatInterface'
-import CompanionHub from './CompanionHub'
+import MessagingDashboard from './MessagingDashboard'
+import AccountPrompt from './AccountPrompt'
 
-type View = 'personality-test' | 'home' | 'hub' | 'chat'
+type View = 'home' | 'personality-test' | 'dashboard' | 'chat'
+type UserTier = 'free' | 'premium' | 'ultimate'
 
 interface CharacterProfile {
     character_name: string
@@ -35,6 +37,22 @@ interface Character {
     bgGradient: string
 }
 
+interface CompanionChat {
+    id: string
+    name: string
+    series: string
+    avatar: string
+    lastMessage: string
+    lastMessageTime: string
+    relationshipLevel: number
+    relationshipScore: number
+    maxScore: number
+    unreadCount: number
+    isOnline: boolean
+    character: Character
+    messageCount: number
+}
+
 interface RelationshipData {
     level: number
     experience: number
@@ -61,11 +79,22 @@ interface PersonalityResults {
     }
 }
 
+interface User {
+    id: string
+    email: string
+    username: string
+    tier: UserTier
+    totalMessageCount: number
+    companionChats: CompanionChat[]
+}
+
 export default function App() {
-    const [currentView, setCurrentView] = useState<View>('personality-test')
-    const [personalityResults, setPersonalityResults] = useState<PersonalityResults | null>(null)
-    const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null)
+    const [currentView, setCurrentView] = useState<View>('home')
+    const [personalityResults, setPersonalityResults] = useState<PersonalityResults | undefined>(undefined)
+    const [selectedCompanion, setSelectedCompanion] = useState<CompanionChat | null>(null)
+    const [user, setUser] = useState<User | null>(null)
     const [isCreatingCharacter, setIsCreatingCharacter] = useState(false)
+    const [showAccountPrompt, setShowAccountPrompt] = useState(false)
     const [relationshipData, setRelationshipData] = useState<RelationshipData>({
         level: 1,
         experience: 0,
@@ -74,19 +103,124 @@ export default function App() {
         unlockedContent: ['basic_chat']
     })
 
+    // Initialize demo user for testing
+    useEffect(() => {
+        if (!user) {
+            setUser({
+                id: 'demo_user',
+                email: 'demo@yapchat.com',
+                username: 'Demo User',
+                tier: 'free',
+                totalMessageCount: 0,
+                companionChats: []
+            })
+        }
+    }, [user])
+
     const handlePersonalityComplete = (results: PersonalityResults) => {
         setPersonalityResults(results)
-        setCurrentView('home')
+        // Direct to dashboard instead of home page (no intermediate screens)
+        setCurrentView('dashboard')
+    }
+
+    const handleStartChat = (companion: CompanionChat) => {
+        setSelectedCompanion(companion)
+        setCurrentView('chat')
+    }
+
+    const handleCreateNewCompanion = () => {
+        setCurrentView('home') // Go back to character creation
+    }
+
+    const handleShowAccountPrompt = () => {
+        setShowAccountPrompt(true)
+    }
+
+    const handleCloseAccountPrompt = () => {
+        setShowAccountPrompt(false)
+    }
+
+    const handleSignUp = async (method: 'google' | 'email', data?: any) => {
+        // Mock sign-up process
+        console.log('Sign up with:', method, data)
+
+        // Update user tier based on selection
+        if (user && data?.tier) {
+            setUser(prev => prev ? { ...prev, tier: data.tier } : null)
+        }
+
+        setShowAccountPrompt(false)
+        // In real app, this would create account and authenticate
+    }
+
+    const handleSignIn = () => {
+        // Mock sign-in process
+        console.log('Sign in clicked')
+        setShowAccountPrompt(false)
+        // In real app, this would show sign-in modal
+    }
+
+    const handleQuickLogin = () => {
+        // Create a mock user for testing purposes
+        const mockUser: User = {
+            id: 'test_user_' + Date.now(),
+            email: 'test@yapchat.com',
+            username: 'TestUser',
+            tier: 'free',
+            totalMessageCount: 0,
+            companionChats: []
+        }
+
+        // Set mock personality results for testing
+        const mockPersonalityResults: PersonalityResults = {
+            preferences: {
+                companion_gender: 'any',
+                emotional_support_need: ['encouragement', 'active listening'],
+                social_energy: 'balanced',
+                stress_response: 'talk it out',
+                relationship_values: ['trust', 'communication'],
+                life_approach: 'spontaneous',
+                curiosity_style: ['pop culture', 'anime/manga'],
+                ideal_companion_role: ['friend', 'confidant'],
+                connection_pace: ['gradual build', 'natural flow']
+            },
+            personality: {
+                openness: 0.7,
+                conscientiousness: 0.6,
+                extraversion: 0.5,
+                agreeableness: 0.8,
+                neuroticism: 0.4
+            },
+            insights: [
+                'You value authentic connections and genuine communication',
+                'You appreciate companions who can balance fun conversation with emotional support',
+                'You prefer relationships that develop naturally over time'
+            ],
+            conversationalStyle: {
+                communicationPreference: 'balanced',
+                energyLevel: 'moderate',
+                humorStyle: 'witty',
+                supportStyle: 'encouraging',
+                responseLength: 'medium'
+            }
+        }
+
+        setUser(mockUser)
+        setPersonalityResults(mockPersonalityResults)
+        setCurrentView('dashboard')
     }
 
     const handleCreateCustomCharacter = async (characterDescription: string) => {
-        if (!personalityResults) return
+        if (!personalityResults || !user) return
 
         setIsCreatingCharacter(true)
 
         try {
+            console.log('🔧 Creating character with description:', characterDescription)
+
             // Create enhanced character prompt using personality data
             const enhancedPrompt = createEnhancedCharacterPrompt(characterDescription, personalityResults)
+            console.log('🔧 Enhanced prompt created, length:', enhancedPrompt.length)
 
             const response = await fetch('/api/create-character', {
                 method: 'POST',
@@ -99,11 +233,18 @@ export default function App() {
                 })
             })
 
+            console.log('🔧 API Response status:', response.status)
+
             if (!response.ok) {
-                throw new Error('Failed to create character')
+                const errorText = await response.text()
+                console.error('🔧 API Error response:', errorText)
+                throw new Error(`Failed to create character: ${response.status} - ${errorText}`)
             }
 
-            const { characterProfile } = await response.json()
+            const result = await response.json()
+            console.log('🔧 API Response received:', result)
+
+            const { characterProfile } = result
 
             // Create character object
             const character: Character = {
@@ -117,10 +258,36 @@ export default function App() {
                 bgGradient: 'from-primary-50 to-primary-100'
             }
 
-            setSelectedCharacter(character)
-            setCurrentView('hub')
+            // Create companion chat
+            const newCompanion: CompanionChat = {
+                id: character.id,
+                name: character.name,
+                series: character.type,
+                avatar: character.icon,
+                lastMessage: "Hi there! I'm excited to chat with you!",
+                lastMessageTime: 'Just now',
+                relationshipLevel: 1,
+                relationshipScore: 0,
+                maxScore: 100,
+                unreadCount: 1,
+                isOnline: true,
+                character: character,
+                messageCount: 0
+            }
+
+            // Add to user's companion chats
+            setUser(prev => prev ? {
+                ...prev,
+                companionChats: [...prev.companionChats, newCompanion]
+            } : null)
+
+            console.log('🔧 Character created successfully, going to dashboard')
+            // Go directly to dashboard
+            setCurrentView('dashboard')
         } catch (error) {
-            alert('Failed to create character. Please try again.')
+            console.error('🔧 Character creation error:', error)
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+            alert(`Failed to create character: ${errorMessage}. Please check the console for details.`)
         } finally {
             setIsCreatingCharacter(false)
         }
@@ -147,7 +314,11 @@ export default function App() {
         // Add user personality traits
         enhancedPrompt += `\nUser Personality Profile:\n`
         if (preferences.emotional_support_need) {
-            enhancedPrompt += `- Emotional support style: ${preferences.emotional_support_need}\n`
+            if (Array.isArray(preferences.emotional_support_need)) {
+                enhancedPrompt += `- Emotional support styles: ${preferences.emotional_support_need.join(', ')}\n`
+            } else {
+                enhancedPrompt += `- Emotional support style: ${preferences.emotional_support_need}\n`
+            }
         }
         if (preferences.social_energy) {
             enhancedPrompt += `- Energy source: ${preferences.social_energy}\n`
@@ -200,7 +371,7 @@ export default function App() {
             .map(([trait, score]) => `${trait} (${Math.round(score * 100)}%)`)
 
         if (strongTraits.length > 0) {
-            enhancedPrompt += `\nStrong Personality Traits: ${strongTraits.join(', ')}\n`
+            enhancedPrompt += `\nStrong personality traits: ${strongTraits.join(', ')}\n`
         }
 
         enhancedPrompt += `\nIMPORTANT: Create a character that embodies their authentic fictional personality while being naturally compatible with this user's emotional needs and relationship values. Let the CHARACTER determine their communication style, humor, and energy - witty characters should be witty, serious characters should be serious, etc. The user's personality profile shows what they need from a relationship, not how the character should act. Focus on creating natural compatibility between the character's authentic traits and the user's personality.`
@@ -225,78 +396,97 @@ export default function App() {
         return '✨' // Default icon
     }
 
-    const handleChatFromHub = () => {
-        setCurrentView('chat')
-    }
-
-    const handleBackToHub = () => {
-        setCurrentView('hub')
+    const handleBackToDashboard = () => {
+        setCurrentView('dashboard')
+        setSelectedCompanion(null)
     }
 
     const handleUpdateRelationship = (newData: RelationshipData) => {
         setRelationshipData(newData)
+
+        // Update companion chat data
+        if (selectedCompanion && user) {
+            const updatedCompanions = user.companionChats.map(companion =>
+                companion.id === selectedCompanion.id
+                    ? {
+                        ...companion,
+                        relationshipLevel: newData.level,
+                        relationshipScore: newData.experience,
+                        messageCount: companion.messageCount + 1
+                    }
+                    : companion
+            )
+
+            setUser(prev => prev ? {
+                ...prev,
+                companionChats: updatedCompanions,
+                totalMessageCount: prev.totalMessageCount + 1
+            } : null)
+        }
     }
 
     const renderCurrentView = () => {
         switch (currentView) {
+            case 'home':
+                return (
+                    <HomePage
+                        onStartPersonalityTest={() => setCurrentView('personality-test')}
+                        onCreateCustomCharacter={handleCreateCustomCharacter}
+                        onLogin={handleQuickLogin}
+                        personalityResults={personalityResults}
+                    />
+                )
             case 'personality-test':
                 return (
                     <PersonalityTest
                         onComplete={handlePersonalityComplete}
+                        onBack={() => setCurrentView('home')}
                     />
                 )
-            case 'home':
-                return personalityResults ? (
-                    <HomePage
-                        onStartPersonalityTest={() => setCurrentView('personality-test')}
-                        onCreateCustomCharacter={handleCreateCustomCharacter}
-                        personalityResults={personalityResults}
-                    />
-                ) : null
-            case 'hub':
-                return selectedCharacter ? (
-                    <CompanionHub
-                        character={selectedCharacter}
-                        relationshipData={relationshipData}
-                        onStartChat={handleChatFromHub}
-                        onBack={() => setCurrentView('home')}
-                        onUpdateRelationship={handleUpdateRelationship}
+            case 'dashboard':
+                return user ? (
+                    <MessagingDashboard
+                        personalityResults={personalityResults || undefined}
+                        onStartChat={handleStartChat}
+                        onCreateNewCompanion={handleCreateNewCompanion}
+                        onShowAccountPrompt={handleShowAccountPrompt}
+                        userTier={user.tier}
+                        messageCount={user.totalMessageCount}
                     />
                 ) : null
             case 'chat':
-                return selectedCharacter ? (
+                return selectedCompanion ? (
                     <ChatInterface
-                        character={selectedCharacter}
-                        onBack={handleBackToHub}
+                        character={selectedCompanion.character}
+                        onBack={handleBackToDashboard}
                         relationshipData={relationshipData}
                         onUpdateRelationship={handleUpdateRelationship}
-                        personalityResults={personalityResults}
+                        personalityResults={personalityResults || undefined}
                     />
                 ) : null
             default:
                 return (
-                    <PersonalityTest
-                        onComplete={handlePersonalityComplete}
+                    <HomePage
+                        onStartPersonalityTest={() => setCurrentView('personality-test')}
+                        onCreateCustomCharacter={handleCreateCustomCharacter}
+                        onLogin={handleQuickLogin}
+                        personalityResults={personalityResults}
                     />
                 )
         }
     }
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen bg-gray-50">
             {renderCurrentView()}
 
-            {/* Loading overlay for character creation */}
-            {isCreatingCharacter && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">Creating Your Perfect Companion</h3>
-                        <p className="text-gray-600">
-                            Using your personality profile to create the ideal match...
-                        </p>
-                    </div>
-                </div>
+            {/* Account Prompt Modal */}
+            {showAccountPrompt && (
+                <AccountPrompt
+                    onClose={handleCloseAccountPrompt}
+                    onSignUp={handleSignUp}
+                    onSignIn={handleSignIn}
+                />
             )}
         </div>
     )

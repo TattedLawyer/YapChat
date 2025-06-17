@@ -46,9 +46,9 @@ const conversationalQuestions: ConversationalQuestion[] = [
     // User's Personality & Emotional Needs (Questions 4-7)
     {
         id: 'emotional_support_need',
-        type: 'select',
+        type: 'multiselect',
         question: "When you're going through something difficult, what do you need most?",
-        subtitle: "Think about what actually helps you feel better",
+        subtitle: "Select all that help you feel better - you can choose multiple options",
         category: "Emotional Needs",
         options: [
             { value: 'someone_listen', label: 'Someone to listen and understand', emoji: '👂' },
@@ -441,19 +441,19 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                     </div>
 
                     <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                        ✨ Let&apos;s Discover Your Soul Companion
+                        ✨ Let&apos;s Find Your Perfect Companion
                     </h1>
 
                     <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                        🌟 I&apos;m excited to help you find your perfect anime/fantasy companion! I just have a few magical questions
+                        🌟 I&apos;m excited to help you find your perfect anime/fantasy companion! I just have a few questions
                         about your personality and what draws you to characters. This feels more like a friendly chat than a test.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div className="p-4 bg-blue-50 rounded-xl">
                             <User className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                            <h3 className="font-semibold text-gray-900 mb-1">✨ Your Soul</h3>
-                            <p className="text-sm text-gray-600">Your inner essence & energy</p>
+                            <h3 className="font-semibold text-gray-900 mb-1">✨ Your Personality</h3>
+                            <p className="text-sm text-gray-600">Your unique traits & energy</p>
                         </div>
 
                         <div className="p-4 bg-purple-50 rounded-xl">
@@ -464,8 +464,8 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
 
                         <div className="p-4 bg-pink-50 rounded-xl">
                             <Star className="h-8 w-8 text-pink-600 mx-auto mb-2" />
-                            <h3 className="font-semibold text-gray-900 mb-1">💕 Perfect Bond</h3>
-                            <p className="text-sm text-gray-600">Your ideal companion magic</p>
+                            <h3 className="font-semibold text-gray-900 mb-1">💕 Perfect Match</h3>
+                            <p className="text-sm text-gray-600">Your ideal companion connection</p>
                         </div>
                     </div>
 
@@ -502,10 +502,10 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                 >
                     <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-6"></div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                        ✨ Weaving Your Perfect Companion Bond
+                        ✨ Finding Your Perfect Companion Match
                     </h3>
                     <p className="text-gray-600">
-                        🔮 Analyzing your soul essence and preferences to summon the ideal magical match...
+                        🔮 Analyzing your personality and preferences to find your ideal companion...
                     </p>
                 </motion.div>
             </div>
@@ -548,6 +548,12 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
                         className="glass-card rounded-2xl p-8 mb-8"
                     >
                         <div className="text-center mb-8">
+                            {currentQuestion.type === 'multiselect' && (
+                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 rounded-full text-purple-700 text-sm font-medium mb-4">
+                                    <CheckCircle className="h-4 w-4" />
+                                    Multiple selections allowed
+                                </div>
+                            )}
                             <h2 className="text-2xl font-semibold text-gray-900 leading-relaxed mb-3">
                                 {currentQuestion.question}
                             </h2>
