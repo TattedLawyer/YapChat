@@ -96,8 +96,43 @@ export default function CompanionHub({
     const timeBasedBg = getTimeBasedBackground()
     const greeting = getTimeBasedGreeting()
 
-    const experienceToNextLevel = relationshipData.level * 100
-    const progressPercentage = (relationshipData.experience / experienceToNextLevel) * 100
+    // RPG-style level progression
+    const getLevelRequirements = (): number[] => {
+        const baseXP = 100
+        const levels = []
+
+        for (let level = 1; level <= 20; level++) {
+            if (level === 1) {
+                levels.push(0)
+            } else {
+                const multiplier = level <= 5 ? 1.0 :
+                    level <= 10 ? 1.5 :
+                        level <= 15 ? 2.0 : 2.5
+                const xpRequired = Math.floor(baseXP * Math.pow(level - 1, 2.2) * multiplier)
+                levels.push(xpRequired)
+            }
+        }
+        return levels
+    }
+
+    const levelRequirements = getLevelRequirements()
+
+    const getCurrentLevelFromXP = (experience: number): number => {
+        for (let i = levelRequirements.length - 1; i >= 0; i--) {
+            if (experience >= levelRequirements[i]) {
+                return i + 1
+            }
+        }
+        return 1
+    }
+
+    const actualLevel = getCurrentLevelFromXP(relationshipData.experience)
+    const currentLevelXP = levelRequirements[actualLevel - 1] || 0
+    const nextLevelXP = levelRequirements[actualLevel] || levelRequirements[levelRequirements.length - 1]
+    const experienceToNextLevel = actualLevel >= 20 ? 0 : nextLevelXP - relationshipData.experience
+    const progressInLevel = relationshipData.experience - currentLevelXP
+    const xpNeededForLevel = nextLevelXP - currentLevelXP
+    const progressPercentage = actualLevel >= 20 ? 100 : (progressInLevel / xpNeededForLevel) * 100
 
     const quickActions = [
         {
@@ -194,7 +229,7 @@ export default function CompanionHub({
                         <div className="flex items-center gap-2">
                             <Heart className="w-5 h-5 text-red-500" />
                             <span className="font-semibold text-gray-900">
-                                Relationship Level {relationshipData.level}
+                                Relationship Level {actualLevel}
                             </span>
                         </div>
                         <div className="flex items-center gap-1 text-sm text-gray-600">
@@ -213,7 +248,7 @@ export default function CompanionHub({
                     </div>
 
                     <div className="flex justify-between text-sm text-gray-600">
-                        <span>{relationshipData.experience} / {experienceToNextLevel} to next level</span>
+                        <span>{relationshipData.experience} / {nextLevelXP} to next level</span>
                         <span>{Math.round(progressPercentage)}%</span>
                     </div>
                 </motion.div>

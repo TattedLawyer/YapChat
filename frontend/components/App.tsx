@@ -7,6 +7,7 @@ import ChatInterface from './ChatInterface'
 import MessagingDashboard from './MessagingDashboard'
 import AccountPrompt from './AccountPrompt'
 
+
 type View = 'home' | 'personality-test' | 'dashboard' | 'chat'
 type UserTier = 'free' | 'premium' | 'ultimate'
 
@@ -77,6 +78,15 @@ interface PersonalityResults {
         supportStyle: string
         responseLength: string
     }
+    ageVerification: {
+        age: number
+        isAdult: boolean
+        contentRestrictions: {
+            allowMildRomantic: boolean
+            allowFlirting: boolean
+            allowNSFW: boolean
+        }
+    }
 }
 
 interface User {
@@ -95,6 +105,7 @@ export default function App() {
     const [user, setUser] = useState<User | null>(null)
     const [isCreatingCharacter, setIsCreatingCharacter] = useState(false)
     const [showAccountPrompt, setShowAccountPrompt] = useState(false)
+
     const [relationshipData, setRelationshipData] = useState<RelationshipData>({
         level: 1,
         experience: 0,
@@ -117,10 +128,37 @@ export default function App() {
         }
     }, [user])
 
+
+
     const handlePersonalityComplete = (results: PersonalityResults) => {
         setPersonalityResults(results)
         // Direct to dashboard instead of home page (no intermediate screens)
         setCurrentView('dashboard')
+    }
+
+    // RPG-style level calculation helper
+    const getCurrentLevelFromXP = (experience: number): number => {
+        const baseXP = 100
+        const levelRequirements = []
+
+        for (let level = 1; level <= 20; level++) {
+            if (level === 1) {
+                levelRequirements.push(0)
+            } else {
+                const multiplier = level <= 5 ? 1.0 :
+                    level <= 10 ? 1.5 :
+                        level <= 15 ? 2.0 : 2.5
+                const xpRequired = Math.floor(baseXP * Math.pow(level - 1, 2.2) * multiplier)
+                levelRequirements.push(xpRequired)
+            }
+        }
+
+        for (let i = levelRequirements.length - 1; i >= 0; i--) {
+            if (experience >= levelRequirements[i]) {
+                return i + 1
+            }
+        }
+        return 1
     }
 
     const handleStartChat = (companion: CompanionChat) => {
@@ -202,6 +240,15 @@ export default function App() {
                 humorStyle: 'witty',
                 supportStyle: 'encouraging',
                 responseLength: 'medium'
+            },
+            ageVerification: {
+                age: 21,
+                isAdult: true,
+                contentRestrictions: {
+                    allowMildRomantic: true,
+                    allowFlirting: true,
+                    allowNSFW: true
+                }
             }
         }
 
@@ -410,7 +457,7 @@ export default function App() {
                 companion.id === selectedCompanion.id
                     ? {
                         ...companion,
-                        relationshipLevel: newData.level,
+                        relationshipLevel: getCurrentLevelFromXP(newData.experience),
                         relationshipScore: newData.experience,
                         messageCount: companion.messageCount + 1
                     }
@@ -424,6 +471,8 @@ export default function App() {
             } : null)
         }
     }
+
+
 
     const renderCurrentView = () => {
         switch (currentView) {
@@ -488,6 +537,8 @@ export default function App() {
                     onSignIn={handleSignIn}
                 />
             )}
+
+
         </div>
     )
 } 

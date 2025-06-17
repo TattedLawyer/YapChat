@@ -15,9 +15,19 @@ interface ConversationalQuestion {
     scaleLabels?: { min: string; max: string }
 }
 
-// Hybrid conversational questions (10-12 total)
+// Hybrid conversational questions with age verification first
 const conversationalQuestions: ConversationalQuestion[] = [
-    // Character Inspiration & Basic Preferences (Questions 1-3)
+    // Age Verification (Question 1)
+    {
+        id: 'age_verification',
+        type: 'text',
+        question: "How old are you?",
+        subtitle: "We need to verify your age to provide age-appropriate content. You must be at least 13 years old to use this application.",
+        category: "Age Verification",
+        placeholder: "Enter your age in years (e.g., 18, 25, etc.)"
+    },
+
+    // Character Inspiration & Basic Preferences (Questions 2-4)
     {
         id: 'favorite_character',
         type: 'text',
@@ -173,6 +183,15 @@ interface PersonalityResults {
         supportStyle: string
         responseLength: string
     }
+    ageVerification: {
+        age: number
+        isAdult: boolean
+        contentRestrictions: {
+            allowMildRomantic: boolean
+            allowFlirting: boolean
+            allowNSFW: boolean
+        }
+    }
 }
 
 interface PersonalityTestProps {
@@ -207,12 +226,32 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
     }
 
     const handleComplete = async () => {
+        // Check age verification first
+        const age = parseInt(answers.age_verification) || 0
+
+        if (age < 13) {
+            alert("Sorry, you must be at least 13 years old to use this application. Please come back when you're older.")
+            return
+        }
+
         setPhase('completing')
 
         // Process answers into personality insights
         const insights = generatePersonalityInsights(answers)
         const conversationalStyle = extractConversationalStyle(answers)
         const personalityScores = calculatePersonalityScores(answers)
+
+        // Process age verification and content restrictions
+        const isAdult = age >= 18
+        const ageVerification = {
+            age,
+            isAdult,
+            contentRestrictions: {
+                allowMildRomantic: age >= 16,  // Mild romantic content at 16+
+                allowFlirting: age >= 16,      // Light flirting at 16+
+                allowNSFW: age >= 18           // NSFW content only at 18+
+            }
+        }
 
         // Simulate processing time
         await new Promise(resolve => setTimeout(resolve, 2000))
@@ -221,7 +260,8 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
             preferences: answers,
             personality: personalityScores,
             insights,
-            conversationalStyle
+            conversationalStyle,
+            ageVerification
         }
 
         onComplete(results)
@@ -419,6 +459,13 @@ export default function PersonalityTest({ onComplete, onBack }: PersonalityTestP
 
     const isCurrentAnswered = () => {
         const answer = answers[currentQuestion.id]
+
+        // Special validation for age verification
+        if (currentQuestion.id === 'age_verification') {
+            const age = parseInt(answer) || 0
+            return age >= 13 && age <= 120 // Reasonable age range
+        }
+
         if (currentQuestion.type === 'multiselect') {
             return Array.isArray(answer) && answer.length > 0
         }

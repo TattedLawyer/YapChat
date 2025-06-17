@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { ArrowLeft, Send, Loader2, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Send, Loader2, AlertCircle, Shield, Heart } from 'lucide-react'
 
 interface Character {
     id: string
@@ -37,6 +37,22 @@ interface PersonalityResults {
     preferences: Record<string, any>
     personality: Record<string, number>
     insights: string[]
+    conversationalStyle: {
+        communicationPreference: string
+        energyLevel: string
+        humorStyle: string
+        supportStyle: string
+        responseLength: string
+    }
+    ageVerification: {
+        age: number
+        isAdult: boolean
+        contentRestrictions: {
+            allowMildRomantic: boolean
+            allowFlirting: boolean
+            allowNSFW: boolean
+        }
+    }
 }
 
 interface ChatInterfaceProps {
@@ -53,6 +69,31 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
     const [isTyping, setIsTyping] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
+
+    // RPG-style level calculation
+    const getCurrentLevelFromXP = (experience: number): number => {
+        const baseXP = 100
+        const levelRequirements = []
+
+        for (let level = 1; level <= 20; level++) {
+            if (level === 1) {
+                levelRequirements.push(0)
+            } else {
+                const multiplier = level <= 5 ? 1.0 :
+                    level <= 10 ? 1.5 :
+                        level <= 15 ? 2.0 : 2.5
+                const xpRequired = Math.floor(baseXP * Math.pow(level - 1, 2.2) * multiplier)
+                levelRequirements.push(xpRequired)
+            }
+        }
+
+        for (let i = levelRequirements.length - 1; i >= 0; i--) {
+            if (experience >= levelRequirements[i]) {
+                return i + 1
+            }
+        }
+        return 1
+    }
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -124,7 +165,7 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
         }
     }, [character.id, messages.length])
 
-    const callChatAPI = async (userMessage: string): Promise<string | string[]> => {
+    const callChatAPI = async (userMessage: string): Promise<{ response: string | string[]; nsfwBlocked?: boolean; requiredLevel?: number; currentLevel?: number }> => {
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
@@ -136,7 +177,8 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                     characterProfile: (character as any).profile,
                     conversationHistory: messages.slice(-10), // Send last 10 messages for context
                     isFirstMessage: false,
-                    userPersonality: personalityResults
+                    userPersonality: personalityResults,
+                    relationshipData: relationshipData
                 }),
             })
 
@@ -153,7 +195,12 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                 setError(null)
             }
 
-            return data.response
+            return {
+                response: data.response,
+                nsfwBlocked: data.nsfwBlocked,
+                requiredLevel: data.requiredLevel,
+                currentLevel: data.currentLevel
+            }
         } catch (error) {
             console.error('Chat API Error:', error)
             setError(error instanceof Error ? error.message : 'Failed to get AI response')
@@ -161,10 +208,10 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
             // Fallback response based on character personality
             const characterProfile = (character as any).profile
             if (characterProfile?.personality_traits?.communication_style) {
-                return `I'm having some trouble connecting right now. Please try again.`
+                return { response: `I'm having some trouble connecting right now. Please try again.` }
             }
 
-            return "I'm having trouble connecting right now. Please try again."
+            return { response: "I'm having trouble connecting right now. Please try again." }
         }
     }
 
@@ -185,9 +232,27 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
         setError(null)
 
         try {
-            const aiResponseText = await callChatAPI(currentMessage)
+            const result = await callChatAPI(currentMessage)
+            const { response: aiResponseText, nsfwBlocked, requiredLevel, currentLevel } = result
 
-            if (Array.isArray(aiResponseText)) {
+            // Handle NSFW content blocking with special message
+            if (nsfwBlocked && requiredLevel && currentLevel) {
+                const blockMessage: Message = {
+                    id: (Date.now() + 1).toString(),
+                    content: aiResponseText as string,
+                    sender: 'ai',
+                    timestamp: new Date()
+                }
+
+                const infoMessage: Message = {
+                    id: (Date.now() + 2).toString(),
+                    content: `💕 *Your relationship needs to reach Level ${requiredLevel} to discuss that topic. Keep chatting to strengthen your bond! (Current: Level ${currentLevel})*`,
+                    sender: 'ai',
+                    timestamp: new Date(Date.now() + 1000)
+                }
+
+                setMessages(prev => [...prev, blockMessage, infoMessage])
+            } else if (Array.isArray(aiResponseText)) {
                 // Handle multiple messages
                 const aiResponses: Message[] = aiResponseText.map((msg, index) => ({
                     id: `${Date.now() + index + 1}`,
@@ -286,7 +351,7 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                             </div>
                         )}
                         <div className="text-sm text-gray-500">
-                            Level {relationshipData.level} • {relationshipData.experience} XP
+                            Level {getCurrentLevelFromXP(relationshipData.experience)} • {relationshipData.experience} XP
                         </div>
                     </div>
                 </div>

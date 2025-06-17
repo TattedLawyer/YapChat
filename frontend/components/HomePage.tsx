@@ -32,6 +32,22 @@ interface PersonalityResults {
     preferences: Record<string, any>
     personality: Record<string, number>
     insights: string[]
+    conversationalStyle: {
+        communicationPreference: string
+        energyLevel: string
+        humorStyle: string
+        supportStyle: string
+        responseLength: string
+    }
+    ageVerification: {
+        age: number
+        isAdult: boolean
+        contentRestrictions: {
+            allowMildRomantic: boolean
+            allowFlirting: boolean
+            allowNSFW: boolean
+        }
+    }
 }
 
 interface HomePageProps {
