@@ -1,0 +1,121 @@
+{
+  "timestamp": "2025-06-18T01:56:42.802Z",
+  "overall": {
+    "passed": 0,
+    "failed": 12,
+    "warnings": 3
+  },
+  "functional": {
+    "Memory Storage Accuracy": {
+      "passed": false,
+      "details": {
+        "error": "socket hang up"
+      },
+      "timestamp": "2025-06-18T02:04:28.562Z"
+    },
+    "Memory Retrieval Precision": {
+      "passed": false,
+      "details": {
+        "error": ""
+      },
+      "timestamp": "2025-06-18T02:04:28.589Z"
+    },
+    "Character Consistency Integration": {
+      "passed": false,
+      "details": {
+        "error": ""
+      },
+      "timestamp": "2025-06-18T02:04:28.599Z"
+    }
+  },
+  "performance": {
+    "Memory Pipeline Load": {
+      "passed": false,
+      "details": {
+        "error": ""
+      },
+      "timestamp": "2025-06-18T02:04:28.608Z"
+    },
+    "Concurrent Users": {
+      "passed": false,
+      "details": {
+        "metrics": {
+          "concurrentUsers": 10,
+          "successfulRequests": 0,
+          "failedRequests": 10,
+          "totalTime": "17ms",
+          "avgTimePerUser": "2ms"
+        },
+        "warning": "Less than 90% of concurrent requests succeeded"
+      },
+      "timestamp": "2025-06-18T02:04:28.625Z"
+    },
+    "Cost Performance Optimization": {
+      "passed": false,
+      "details": {
+        "error": ""
+      },
+      "timestamp": "2025-06-18T02:04:28.627Z"
+    }
+  },
+  "security": {
+    "Memory Data Protection": {
+      "passed": false,
+      "details": {
+        "error": ""
+      },
+      "timestamp": "2025-06-18T02:04:28.628Z"
+    },
+    "Injection Resistance": {
+      "passed": false,
+      "details": {
+        "metrics": {
+          "totalInjectionTests": 7,
+          "handledProperly": 0,
+          "resistanceRate": "0.0%"
+        },
+        "warning": "Some injection attacks may not be properly handled"
+      },
+      "timestamp": "2025-06-18T02:04:28.635Z"
+    }
+  },
+  "cost": {},
+  "ux": {
+    "Subjective Quality Assessment": {
+      "passed": false,
+      "details": {
+        "error": ""
+      },
+      "timestamp": "2025-06-18T02:04:28.637Z"
+    },
+    "Conversation Continuity": {
+      "passed": false,
+      "details": {
+        "error": ""
+      },
+      "timestamp": "2025-06-18T02:04:28.637Z"
+    }
+  },
+  "resilience": {
+    "Failure Recovery": {
+      "passed": false,
+      "details": {
+        "metrics": {
+          "totalTests": 3,
+          "successfulRecoveries": 0,
+          "recoveryRate": "0.0%"
+        },
+        "warning": "Recovery rate below 80%"
+      },
+      "timestamp": "2025-06-18T02:04:30.143Z"
+    },
+    "Graceful Degradation": {
+      "passed": false,
+      "details": {
+        "error": ""
+      },
+      "timestamp": "2025-06-18T02:04:30.145Z"
+    }
+  },
+  "monitoring": {}
+}

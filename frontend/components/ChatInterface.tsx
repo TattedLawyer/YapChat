@@ -129,7 +129,10 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                             message: "Hi",
                             characterProfile: (character as any).profile,
                             isFirstMessage: true,
-                            userPersonality: personalityResults
+                            userPersonality: personalityResults,
+                            userId: 'user_' + Date.now(), // TODO: Replace with actual user ID
+                            characterId: character.id,
+                            conversationId: `conv_${character.id}_${Date.now()}`
                         }),
                     })
 
@@ -173,7 +176,7 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
 
             initializeChat()
         }
-    }, [character.id, messages.length])
+    }, [character, messages.length, personalityResults])
 
     const callChatAPI = async (userMessage: string): Promise<{ response: string | string[]; nsfwBlocked?: boolean; requiredLevel?: number; currentLevel?: number }> => {
         try {
@@ -188,7 +191,10 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                     conversationHistory: messages.slice(-10), // Send last 10 messages for context
                     isFirstMessage: false,
                     userPersonality: personalityResults,
-                    relationshipData: relationshipData
+                    relationshipData: relationshipData,
+                    userId: 'user_' + Date.now(), // TODO: Replace with actual user ID
+                    characterId: character.id,
+                    conversationId: `conv_${character.id}_${Date.now()}`
                 }),
             })
 
@@ -375,8 +381,8 @@ export default function ChatInterface({ character, onBack, relationshipData, onU
                         >
                             <div
                                 className={`max-w-xs lg:max-w-md rounded-2xl px-4 py-3 ${msg.sender === 'user'
-                                        ? 'yapchat-glass-user yapchat-glow'
-                                        : `yapchat-glass-character yapchat-glow-character ${msg.fallback ? 'opacity-75' : ''}`
+                                    ? 'yapchat-glass-user yapchat-glow'
+                                    : `yapchat-glass-character yapchat-glow-character ${msg.fallback ? 'opacity-75' : ''}`
                                     }`}
                             >
                                 <p className="text-sm whitespace-pre-wrap font-body text-text-primary">{msg.content}</p>

@@ -12,15 +12,16 @@ interface AccountPromptProps {
 
 const pricingTiers = [
     {
-        id: 'free',
-        name: 'Free',
-        price: '$0',
+        id: 'starter',
+        name: 'Starter',
+        price: '$4.99/month',
         features: [
+            '50 conversations/day',
             '2 AI Companions',
-            'Basic conversations',
+            'Basic memory system',
             'Community support'
         ],
-        buttonText: 'Create Free Account',
+        buttonText: 'Start Free Trial',
         popular: false
     },
     {
@@ -28,28 +29,27 @@ const pricingTiers = [
         name: 'Premium',
         price: '$9.99/month',
         features: [
+            '100 conversations/day',
             '5 AI Companions',
-            'Advanced personality matching',
-            'Priority support',
-            'Custom companion personalities',
-            'Relationship progression tracking'
+            'Advanced memory system',
+            'Personality matching',
+            'Priority support'
         ],
         buttonText: 'Start Premium Trial',
         popular: true
     },
     {
-        id: 'ultimate',
-        name: 'Ultimate',
-        price: '$19.99/month',
+        id: 'pro',
+        name: 'Pro',
+        price: '$16.99/month',
         features: [
+            '200 conversations/day',
             '10 AI Companions',
-            'All Premium features',
-            'Early access to new features',
-            'Dedicated support',
-            'Custom companion creation tools',
-            'Advanced analytics'
+            'Multi-character learning',
+            'Advanced analytics',
+            'Dedicated support'
         ],
-        buttonText: 'Go Ultimate',
+        buttonText: 'Go Pro',
         popular: false
     }
 ]
@@ -87,7 +87,7 @@ export default function AccountPrompt({ onClose, onSignUp, onSignIn }: AccountPr
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-border-glass">
                     <div>
-                        <h2 className="text-2xl font-bold font-display text-text-primary">🎉 You're bonding amazingly!</h2>
+                        <h2 className="text-2xl font-bold font-display text-text-primary">🎉 You&apos;re bonding amazingly!</h2>
                         <p className="text-text-secondary mt-1 font-body">Save your progress and unlock more companions</p>
                     </div>
                     <button
@@ -109,8 +109,8 @@ export default function AccountPrompt({ onClose, onSignUp, onSignIn }: AccountPr
                                         key={tier.id}
                                         onClick={() => setSelectedTier(tier.id)}
                                         className={`relative yapchat-glass rounded-2xl p-6 cursor-pointer transition-all duration-300 yapchat-glow ${selectedTier === tier.id
-                                                ? 'yapchat-glass-accent border-2 border-accent-primary'
-                                                : 'border-2 border-border-glass hover:border-accent-primary'
+                                            ? 'yapchat-glass-accent border-2 border-accent-primary'
+                                            : 'border-2 border-border-glass hover:border-accent-primary'
                                             } ${tier.popular ? 'yapchat-glow-character' : ''}`}
                                     >
                                         {tier.popular && (

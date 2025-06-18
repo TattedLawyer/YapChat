@@ -10,7 +10,7 @@ import CharacterNaming from './CharacterNaming'
 
 
 type View = 'home' | 'personality-test' | 'dashboard' | 'chat' | 'naming'
-type UserTier = 'free' | 'premium' | 'ultimate'
+type UserTier = 'starter' | 'premium' | 'pro'
 
 interface CharacterProfile {
     character_name: string
@@ -126,7 +126,7 @@ export default function App() {
                 id: 'demo_user',
                 email: 'demo@yapchat.com',
                 username: 'Demo User',
-                tier: 'free',
+                tier: 'starter',
                 totalMessageCount: 0,
                 companionChats: []
             })
@@ -223,7 +223,7 @@ export default function App() {
             id: 'test_user_' + Date.now(),
             email: 'test@yapchat.com',
             username: 'TestUser',
-            tier: 'free',
+            tier: 'starter',
             totalMessageCount: 0,
             companionChats: []
         }

@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "@anthropic-ai/sdk": "^0.54.0",
+        "@google/generative-ai": "^0.21.0",
         "@heroicons/react": "^2.0.18",
         "@next/font": "14.0.4",
         "@supabase/auth-helpers-nextjs": "^0.10.0",

@@ -58,7 +58,7 @@ interface MessagingDashboardProps {
     onStartChat: (companion: CompanionChat) => void
     onCreateNewCompanion: () => void
     onShowAccountPrompt?: () => void
-    userTier: 'free' | 'premium' | 'ultimate'
+    userTier: 'starter' | 'premium' | 'pro'
     messageCount: number
 }
 
@@ -142,9 +142,9 @@ const demoCompanions: CompanionChat[] = [
 ]
 
 const tierLimits = {
-    free: 2,
+    starter: 2,
     premium: 5,
-    ultimate: 10
+    pro: 10
 }
 
 export default function MessagingDashboard({
@@ -152,7 +152,7 @@ export default function MessagingDashboard({
     onStartChat,
     onCreateNewCompanion,
     onShowAccountPrompt,
-    userTier = 'free',
+    userTier = 'starter',
     messageCount = 0
 }: MessagingDashboardProps) {
     const [companions, setCompanions] = useState<CompanionChat[]>(demoCompanions)
@@ -161,7 +161,7 @@ export default function MessagingDashboard({
 
     // Check if user should see account prompt
     useEffect(() => {
-        if (messageCount >= 10 && userTier === 'free' && onShowAccountPrompt) {
+        if (messageCount >= 10 && userTier === 'starter' && onShowAccountPrompt) {
             onShowAccountPrompt()
         }
     }, [messageCount, userTier, onShowAccountPrompt])
@@ -185,9 +185,9 @@ export default function MessagingDashboard({
 
     const getTierBadge = () => {
         const badges = {
-            free: { icon: User, color: 'text-text-muted', bg: 'yapchat-glass-subtle' },
+            starter: { icon: User, color: 'text-text-muted', bg: 'yapchat-glass-subtle' },
             premium: { icon: Star, color: 'text-accent-primary', bg: 'yapchat-glass-accent' },
-            ultimate: { icon: Crown, color: 'text-accent-warning', bg: 'yapchat-glass-premium' }
+            pro: { icon: Crown, color: 'text-accent-warning', bg: 'yapchat-glass-premium' }
         }
         return badges[userTier]
     }

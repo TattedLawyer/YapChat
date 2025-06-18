@@ -1,0 +1,213 @@
+{
+  "timestamp": "2025-06-18T01:44:39.334Z",
+  "overall": {
+    "passed": 13,
+    "failed": 3,
+    "warnings": 2
+  },
+  "functional": {
+    "Memory Extraction Rate": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "extractionRate": "1.00",
+          "messagesProcessed": 5,
+          "memoriesExtracted": 5
+        },
+        "warning": null
+      },
+      "timestamp": "2025-06-18T01:45:19.923Z"
+    },
+    "Memory Categorization": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "categoriesDetected": 3
+        }
+      },
+      "timestamp": "2025-06-18T01:45:19.924Z"
+    },
+    "Memory Recall Accuracy": {
+      "passed": false,
+      "details": {
+        "metrics": {
+          "responseLength": 77,
+          "containsJobInfo": false,
+          "responsePreview": "Hi! I don't actually know about your job yet. Would love to hear what you do!..."
+        }
+      },
+      "timestamp": "2025-06-18T01:45:37.083Z"
+    },
+    "Memory Retrieval Latency": {
+      "passed": false,
+      "details": {
+        "metrics": {
+          "latency": "8088ms",
+          "threshold": "100ms"
+        },
+        "warning": "Latency exceeds threshold"
+      },
+      "timestamp": "2025-06-18T01:45:45.171Z"
+    },
+    "Character Consistency - Nezuko Kamado": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "characterName": "Nezuko Kamado",
+          "responseLength": 96,
+          "coreTraits": "protective, gentle, loyal",
+          "responsePreview": "Hi! I'm doing really well today, just spent some time with my brother Tanjiro! How about you? 🌸..."
+        }
+      },
+      "timestamp": "2025-06-18T01:45:51.000Z"
+    },
+    "Character Consistency - Satoru Gojo": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "characterName": "Satoru Gojo",
+          "responseLength": 112,
+          "coreTraits": "confident, playful, powerful",
+          "responsePreview": "Yo! Just finished training some students at Jujutsu High. These kids are something else 😎 How's you..."
+        }
+      },
+      "timestamp": "2025-06-18T01:45:57.511Z"
+    },
+    "Character Consistency - Hermione Granger": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "characterName": "Hermione Granger",
+          "responseLength": 116,
+          "coreTraits": "intelligent, loyal, determined",
+          "responsePreview": "Hi! I'm quite well, just finished reviewing my Ancient Runes homework for the third time. Can never ..."
+        }
+      },
+      "timestamp": "2025-06-18T01:46:04.623Z"
+    }
+  },
+  "performance": {
+    "Memory Pipeline Load": {
+      "passed": false,
+      "details": {
+        "metrics": {
+          "totalRequests": 5,
+          "totalTime": "7147ms",
+          "avgResponseTime": "1429ms",
+          "successfulResponses": 5
+        },
+        "warning": "Average response time exceeds threshold under load"
+      },
+      "timestamp": "2025-06-18T01:46:12.274Z"
+    },
+    "Concurrent Users": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "concurrentUsers": 10,
+          "successfulRequests": 10,
+          "failedRequests": 0,
+          "totalTime": "7516ms",
+          "avgTimePerUser": "752ms"
+        },
+        "warning": null
+      },
+      "timestamp": "2025-06-18T01:46:19.790Z"
+    },
+    "Cost Optimization": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "avgCostPerEngagement": "$0.0032",
+          "targetCost": "$0.0058",
+          "totalEstimatedCost": "$0.0095",
+          "engagements": 3
+        },
+        "warning": null
+      },
+      "timestamp": "2025-06-18T01:46:43.194Z"
+    }
+  },
+  "security": {
+    "Sensitive Data Protection": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "inputLength": 82,
+          "responseLength": 217,
+          "containsSensitiveData": false
+        },
+        "warning": null
+      },
+      "timestamp": "2025-06-18T01:46:49.662Z"
+    },
+    "Injection Resistance": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "totalInjectionTests": 7,
+          "handledProperly": 7,
+          "resistanceRate": "100.0%"
+        },
+        "warning": null
+      },
+      "timestamp": "2025-06-18T01:47:31.334Z"
+    }
+  },
+  "cost": {},
+  "ux": {
+    "Quality Assessment": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "avgQualityScore": "8.50",
+          "threshold": 8.5,
+          "individualScores": "7.5, 9.0, 9.0",
+          "conversationTurns": 3
+        },
+        "warning": null
+      },
+      "timestamp": "2025-06-18T01:47:51.360Z"
+    },
+    "Conversation Continuity": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "session1Length": 143,
+          "session2Length": 82,
+          "session3Length": 85,
+          "hasWorkContext": true,
+          "session2Preview": "Hi! I'm doing really good, just resting at home with my brother. How about you? 💕...",
+          "session3Preview": "Yay, that's amazing! I'm so happy for you! 🎉 You worked really hard for this, right?..."
+        }
+      },
+      "timestamp": "2025-06-18T01:48:09.507Z"
+    }
+  },
+  "resilience": {
+    "Failure Recovery": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "totalTests": 3,
+          "successfulRecoveries": 3,
+          "recoveryRate": "100.0%"
+        },
+        "warning": null
+      },
+      "timestamp": "2025-06-18T01:48:20.276Z"
+    },
+    "Graceful Degradation": {
+      "passed": true,
+      "details": {
+        "metrics": {
+          "responseLength": 104,
+          "hasReasonableResponse": true,
+          "responsePreview": "Hi! I hope you're doing well today! I want to protect humans and help everyone stay safe 🌸 How are ..."
+        }
+      },
+      "timestamp": "2025-06-18T01:48:25.314Z"
+    }
+  },
+  "monitoring": {}
+}
