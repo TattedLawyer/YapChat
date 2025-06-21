@@ -9,7 +9,7 @@ YapChat is an advanced AI companion platform featuring sophisticated memory capa
 YapChat enables AI companions to maintain persistent, contextual memories across conversations, creating more personalized and meaningful interactions. The platform combines:
 
 - **Semantic Memory Processing** - AI companions remember important details from conversations
-- **Contextual Recall** - Past interactions inform future responses
+- **Contextual Recall** - Past interactions inform future responses  
 - **Personality Persistence** - Characters maintain consistent traits and relationships
 - **Emotional Intelligence** - Memory-enhanced empathetic responses
 
@@ -20,19 +20,25 @@ YapChat follows an Open Core business model:
 - **Open Source**: Community documentation, guides, and educational resources
 - **Commercial**: Full platform, proprietary AI engine, and enterprise features
 
-## Community Resources
+## Key Features
 
-### Documentation
-- Platform overview and capabilities
-- Integration guides for developers
-- Best practices for AI memory systems
-- Research papers and technical insights
+### Memory Architecture
+- Advanced semantic similarity matching
+- Two-phase memory processing (extraction + validation)
+- Intelligent memory controller operations
+- Context-aware conversation orchestration
 
-### Getting Started
-1. Review the documentation in this repository
-2. Join our community discussions
-3. Follow development updates
-4. Contribute to open source components
+### AI Capabilities  
+- Natural conversation flow with memory integration
+- Personality-consistent character responses
+- Emotional context understanding
+- Relationship progression tracking
+
+### Technical Highlights
+- Vector-based memory search and retrieval
+- Configurable similarity thresholds for relevance
+- Comprehensive logging and debugging capabilities
+- Production-ready scalability and performance
 
 ## Research & Development
 
@@ -59,6 +65,39 @@ The full YapChat platform includes:
 - **Discussions**: Community Q&A and ideas
 - **Updates**: Follow development progress
 
+## Architecture Overview
+
+YapChat uses a sophisticated multi-service architecture:
+
+### Memory Processing Service
+- Extracts meaningful information from conversations
+- Stores memories with semantic embeddings
+- Provides intelligent memory retrieval
+
+### Prompt Orchestration Service  
+- Integrates memory context into AI responses
+- Manages conversation flow and personality consistency
+- Optimizes response quality and relevance
+
+### Integration Points
+- RESTful API for easy integration
+- Webhook support for real-time updates
+- Comprehensive SDK for developers
+
+## Getting Started
+
+### For Developers
+1. Review the API documentation
+2. Explore integration examples
+3. Join our developer community
+4. Follow best practices guides
+
+### For Researchers
+1. Study our memory architecture papers
+2. Contribute to open research initiatives
+3. Collaborate on AI memory improvements
+4. Share findings with the community
+
 ## License
 
 This Open Core repository is licensed under MIT License.
@@ -74,6 +113,17 @@ We welcome contributions to:
 
 Please see our contribution guidelines for details.
 
+## Security & Privacy
+
+YapChat takes security seriously:
+- Enterprise-grade data protection
+- Privacy-first architecture
+- Compliance with industry standards
+- Regular security audits
+
 ---
 
 **YapChat** - Making AI conversations more human through advanced memory
+
+*This is the Open Core repository containing public documentation only.*
+*The full commercial platform is available separately.*
