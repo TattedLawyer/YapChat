@@ -54,17 +54,20 @@ export class PromptOrchestrationService implements IPromptOrchestrationService {
         let memoryContext = ''
         let memoriesAccessed = 0
         try {
-            console.log('[Orchestration] 1. Attempting to search for relevant memories...')
+            // console.log('[Orchestration] 1. Attempting to search for relevant memories...')
             const memoryService = await getMemoryService()
             const searchResults = await memoryService.searchMemories({
                 query: request.userMessage,
                 userId: request.context.userProfile.userId,
                 characterId: request.context.characterProfile.characterId,
                 limit: 5,
-                similarityThreshold: 0.02  // TUNED: Captures real semantic matches (0.030-0.507) after fixing similarity_score bug
+                similarityThreshold: 0.02  // CRITICAL: 0.02 threshold captures real semantic matches (0.030-0.507 range)
+                // This was tuned after fixing the similarity_score field bug that caused 0% memory recall
+                // Higher thresholds (0.65+) prevented the AI from finding relevant memories
+                // See MEMORY_SYSTEM_STATUS_FINAL.md for full debugging story
             })
 
-            console.log(`[Orchestration] 2. Found ${searchResults.memories.length} relevant memories.`)
+            // console.log(`[Orchestration] 2. Found ${searchResults.memories.length} relevant memories.`)
 
             if (searchResults.memories.length > 0) {
                 memoriesAccessed = searchResults.memories.length
@@ -73,7 +76,10 @@ export class PromptOrchestrationService implements IPromptOrchestrationService {
                     .join('\n')
 
                 memoryContext = `\n\nRELEVANT MEMORIES FROM PREVIOUS CONVERSATIONS:\n${relevantMemories}\n\nUse these memories to provide personalized, contextual responses that acknowledge our past interactions.`
-                console.log(`📚 Retrieved ${memoriesAccessed} relevant memories for context`)
+                // Production logging: only log memory retrieval success
+                if (process.env.NODE_ENV !== 'production') {
+                    console.log(`📚 Retrieved ${memoriesAccessed} relevant memories for context`)
+                }
             }
         } catch (error) {
             console.error('Memory retrieval error:', error)
@@ -83,7 +89,7 @@ export class PromptOrchestrationService implements IPromptOrchestrationService {
         // Build prompt with memory context
         const prompt = this.buildBasicPrompt(request, systemPromptDirectives, memoryContext)
 
-        console.log('[Orchestration] 3. Final prompt being sent to AI:', JSON.stringify(prompt, null, 2))
+        // console.log('[Orchestration] 3. Final prompt being sent to AI:', JSON.stringify(prompt, null, 2))
 
         try {
             const response = await this.anthropic.generateText({

@@ -266,14 +266,38 @@ export class RobustMemoryProcessingService {
     }
 
     /**
-     * Search for relevant memories (required interface for prompt orchestration)
-     * This method bridges our robust processing with the expected interface
+     * Search for relevant memories using semantic similarity
+     * 
+     * CRITICAL ARCHITECTURE NOTE:
+     * This function was the source of the "Great Memory Crisis" where the system had 0% recall accuracy.
+     * The root cause was a field name mismatch between database and TypeScript expectations.
+     * 
+     * DATABASE FUNCTION: search_memories() returns field named 'similarity_score'
+     * TYPESCRIPT CODE: Expected field named 'similarity' 
+     * RESULT: All memories defaulted to 0.5 similarity, preventing proper ranking
+     * 
+     * THE FIX: Use mem.similarity_score (not mem.similarity) - see line ~335
+     * 
+     * SIMILARITY THRESHOLD TUNING:
+     * - Threshold 0.02 is intentionally LOW to capture real semantic matches
+     * - Actual similarity scores range from 0.030-0.507 for relevant memories  
+     * - Previous threshold 0.65+ caused 0% memory recall (too restrictive)
+     * - Lower threshold captures more context while filtering random noise
+     * 
+     * @param query - User message to find relevant memories for
+     * @param userId - User identifier 
+     * @param characterId - Character identifier (optional)
+     * @param similarityThreshold - Minimum similarity score (default: 0.02)
+     * @param limit - Maximum memories to return (default: 5)
+     * @param memoryTypes - Filter by memory types (optional)
      */
     async searchMemories({
         query,
         userId,
         characterId,
-        similarityThreshold = 0.02,  // TUNED: 0.02 captures relevant memories (0.030-0.507 range) while filtering noise
+        similarityThreshold = 0.02,  // CRITICAL: 0.02 threshold tuned for semantic similarity range 0.030-0.507
+        // This low threshold captures real semantic matches while filtering random noise
+        // Higher thresholds (0.65+) caused 0% memory recall - see MEMORY_SYSTEM_STATUS_FINAL.md
         limit = 5,
         memoryTypes
     }: {
@@ -325,17 +349,20 @@ export class RobustMemoryProcessingService {
                 throw error
             }
 
-            // CRITICAL: Database function returns 'similarity_score' field, NOT 'similarity'
-            // This was the root cause of the 0.500 fallback bug that prevented memory recall
+            // CRITICAL FIX: The Great Memory Crisis Resolution
             // The search_memories PostgreSQL function calculates: (1 - (embedding <=> query_embedding)) AS similarity_score
+            // Database returns 'similarity_score' but code was expecting 'similarity' - this caused 0% memory recall
             // Similarity scores typically range from 0.030-0.507 for semantic matches
+            // 
+            // BEFORE FIX: All memories returned 0.500 similarity (fallback value)
+            // AFTER FIX: Real similarity scores like 0.288, 0.274, 0.265, 0.052, 0.044
             const memories = (data || []).map((mem: any) => ({
                 id: mem.id,
                 content: mem.memory_text || mem.content,
                 memory_type: mem.memory_type,
                 importance: mem.importance_score || mem.importance || 0.5,
                 metadata: mem.extracted_entities || mem.metadata || {},
-                similarity: mem.similarity_score || 0.5  // FIXED: Use similarity_score from database
+                similarity: mem.similarity_score || 0.5  // CRITICAL: Use similarity_score (not similarity) from database
             }))
 
             const totalLatency = Date.now() - startTime
