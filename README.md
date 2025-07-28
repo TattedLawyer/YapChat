@@ -32,6 +32,17 @@ YapChat's 21 starter personalities are just the beginning. Future plans include 
 - **Personality Consistency**: Each AI maintains their unique traits across all conversations
 - **Seamless Experience**: Switch between personalities while maintaining conversation context
 
+### 🛡️ Guardian Protection System
+- **Real-Time Safety Monitoring**: Advanced AI continuously monitors conversations for user wellbeing
+- **Crisis Support Integration**: Immediate access to professional mental health resources when needed
+- **Empathetic Response Protocols**: Trained to provide supportive, non-judgmental assistance during difficult moments
+- **Privacy-First Protection**: Safety measures that respect user privacy while ensuring wellbeing
+- **24/7 Availability**: Guardian system works around the clock to keep users safe
+- **Professional Resource Connection**: Seamless referrals to crisis hotlines and mental health professionals
+
+**Your Safety is Our Priority**
+YapChat's Guardian System ensures that every interaction is not just engaging, but safe. Whether you're having a casual conversation or going through a difficult time, our AI companions are equipped to provide appropriate support and connect you with professional help when needed.
+
 ### 🎨 Custom Personality Creation
 - **Build Your Own**: Design personalized AI companions with custom traits
 - **Unlimited Creativity**: Create companions for any purpose or interest
