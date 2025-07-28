@@ -162,45 +162,40 @@ graph TD
 - **Profile Integration**: Combines all dimensions into a comprehensive, nuanced personality portrait
 - **Smart Matching**: Compares profiles using weighted compatibility algorithms for meaningful connections
 
-### 📊 Comprehensive Profile Dimensions
-
-**Personality Traits**
-- **Openness**: Creativity and openness to new experiences
-- **Conscientiousness**: Organization and self-discipline
-- **Extraversion**: Social energy and communication style
-- **Agreeableness**: Cooperation and interpersonal harmony
-- **Emotional Stability**: Stress management and emotional regulation
-
-**Interest Categories**
-- **Professional Interests**: Career preferences and work style
-- **Personal Dimensions**: Communication style, gaming preferences, values & goals, social preferences
-
-### 🔄 Personality Profiling Journey
+### 🔬 Detailed Analysis Process
 
 ```mermaid
 graph TD
-    A["🗣️ Natural Conversations"] --> B["🧠 LLM Analysis"]
-    B --> C["📊 Personality Insights"]
-    C --> D["⚖️ Compatibility Matching"]
+    A["💬 Raw Conversation Input"] --> B["🔍 Content Analysis"]
+    B --> C["🎯 Pattern Recognition"] 
+    C --> D["🧠 LLM Analysis"]
+    D --> E["📊 Multi-Dimensional Scoring"]
+    E --> F["🔗 Profile Integration"]
+    F --> G["⚖️ Smart Matching"]
     
-    A1["Chat with AI Companions"] --> B1["Understand Your Style"]
-    B1 --> C1["Build Your Profile"]
-    C1 --> D1["Find Compatible Matches"]
-```
-
-### 🎯 User Experience Flow
-
-```mermaid
-graph LR
-    A["🔍 Discover Personalities"] --> B["💬 Chat & Connect"]
-    B --> C["📈 Profile Development"]
-    C --> D["🤝 Match with Others"]
+    B1["Examines topics, word choice,<br/>emotional expressions"] --> B
+    C1["Identifies recurring themes in<br/>interests, values, communication"] --> C
+    D1["AI interprets personality indicators<br/>using psychology research"] --> D
+    E1["Creates precise measurements<br/>across proven frameworks"] --> E
+    F1["Combines all dimensions into<br/>comprehensive personality portrait"] --> F
+    G1["Compares profiles using weighted<br/>compatibility algorithms"] --> G
     
     style A fill:#e8f5e8
-    style B fill:#e3f2fd
-    style C fill:#fff3e0
-    style D fill:#fce4ec
+    style D fill:#e3f2fd
+    style F fill:#fff3e0
+    style G fill:#fce4ec
 ```
+```
+
+This visual diagram:
+✅ **Shows the step-by-step process** visually instead of bullet points  
+✅ **Includes the explanations** as connected nodes  
+✅ **More engaging** than plain text  
+✅ **Easier to understand** the flow  
+✅ **Professional presentation** that matches the rest of your diagrams  
+✅ **Color-coded stages** for visual clarity
+
+Much better than just having explanatory text sitting there!
 
 ### 🎲 Compatibility Matching
 
