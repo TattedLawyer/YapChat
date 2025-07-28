@@ -32,6 +32,44 @@ YapChat's 21 starter personalities are just the beginning. Future plans include 
 - **Personality Consistency**: Each AI maintains their unique traits across all conversations
 - **Seamless Experience**: Switch between personalities while maintaining conversation context
 
+### 🔄 Agentic Memory Architecture
+
+YapChat's revolutionary **Agentic Memory System** goes beyond simple chat history to create truly intelligent, context-aware conversations.
+
+**What Makes Our Memory "Agentic"**
+- **Smart Categorization**: Automatically organizes memories by type (personal values, goals, preferences, experiences)
+- **Contextual Retrieval**: Finds relevant memories based on conversation topic, not just keywords
+- **Cross-Conversation Learning**: Insights from one conversation enhance all future interactions
+- **Personality-Aware Storage**: Memories are tagged with which AI personality was involved
+
+```mermaid
+graph TD
+    A["💬 User Conversation"] --> B["🧠 Memory Extraction"]
+    B --> C["🏷️ Smart Categorization"]
+    C --> D["💾 Secure Storage"]
+    
+    E["💬 New Conversation"] --> F["🔍 Context Analysis"]
+    F --> G["📚 Relevant Memory Retrieval"]
+    G --> H["💡 Enhanced Response"]
+    
+    D --> G
+    C --> I["🔐 User Isolation"]
+    I --> G
+    
+    style A fill:#e8f5e8
+    style E fill:#e8f5e8
+    style H fill:#fff3e0
+    style I fill:#ffebee
+```
+
+**The YapChat Memory Advantage**
+- **No Memory Loss**: Unlike traditional chatbots that forget previous conversations
+- **Contextual Intelligence**: Remembers not just what you said, but the context and emotional tone
+- **Privacy by Design**: Your memories are isolated and never shared between users
+- **Continuous Learning**: Each conversation makes your AI companions more personalized
+
+This creates AI companions that truly know you, rather than starting from scratch each time.
+
 ### 🛡️ Guardian Protection System
 - **Real-Time Safety Monitoring**: Advanced AI continuously monitors conversations for user wellbeing
 - **Crisis Support Integration**: Immediate access to professional mental health resources when needed
