@@ -152,7 +152,6 @@ graph TD
 - **Behavioral Context**: How you interact across different digital environments
 - **Holistic Profiling**: Beyond conversations - your entire digital personality fingerprint
 - **Dynamic Learning**: Profile accuracy improves as more data sources connectc
-```
 
 ### 🌟 Creator Program Benefits
 
