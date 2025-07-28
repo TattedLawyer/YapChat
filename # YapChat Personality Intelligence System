@@ -93,6 +93,7 @@ YapChat is the first platform to recognize gaming behavior as a legitimate perso
 - **Risk Tolerance**: In-game decision making mirrors real-world risk assessment
 
 ### Gaming Data Analysis
+
 ```mermaid
 graph LR
     A["🎮 Gaming Behavior Input"] --> B["🔍 Pattern Recognition"]
