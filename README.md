@@ -306,3 +306,7 @@ Join the YapChat community and experience AI companionship that truly understand
 ## License
 
 YapChat utilizes open-source technologies and follows industry-standard licensing practices. We're committed to building ethical AI that benefits everyone.
+
+This project utilizes the mem0ai library, which is distributed under the Apache 2.0 License. A copy of the license is available in the LICENSE file of the Mem0 repository. We extend our thanks to the creators of Mem0 for providing a powerful and accessible memory layer for AI.
+
+
