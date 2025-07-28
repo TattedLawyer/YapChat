@@ -105,6 +105,44 @@ YapChat features breakthrough personality analysis technology that creates compr
 - **RIASEC Interests**: Professional career and interest alignment system
 - **Validated Methods**: Used by psychologists and career counselors worldwide
 
+### 🔬 Personality Analysis Pipeline
+
+```mermaid
+graph TD
+    A["💬 Raw Conversation Data"] --> B["🔍 Content Analysis"]
+    B --> C["📝 Communication Style Extraction"]
+    B --> D["🎯 Interest Pattern Recognition"]
+    B --> E["💭 Value & Goal Identification"]
+    
+    C --> F["🧠 LLM Personality Analysis"]
+    D --> F
+    E --> F
+    
+    F --> G["📊 Big Five Scoring"]
+    F --> H["🎨 RIASEC Interest Mapping"]
+    F --> I["💬 Communication Style Profile"]
+    
+    G --> J["🔗 Comprehensive Personality Profile"]
+    H --> J
+    I --> J
+    
+    J --> K["⚖️ Compatibility Matching Algorithm"]
+    K --> L["🤝 Compatible User Recommendations"]
+    
+    style A fill:#e8f5e8
+    style F fill:#e3f2fd
+    style J fill:#fff3e0
+    style L fill:#fce4ec
+```
+
+**How Each Step Works:**
+- **Content Analysis**: Examines conversation topics, word choice, and emotional expressions
+- **Pattern Recognition**: Identifies recurring themes in interests, values, and communication preferences  
+- **LLM Analysis**: Advanced AI interprets subtle personality indicators using established psychology research
+- **Multi-Dimensional Scoring**: Creates precise measurements across proven personality frameworks
+- **Profile Integration**: Combines all dimensions into a comprehensive, nuanced personality portrait
+- **Smart Matching**: Compares profiles using weighted compatibility algorithms for meaningful connections
+
 ### 📊 Comprehensive Profile Dimensions
 
 **Personality Traits**
